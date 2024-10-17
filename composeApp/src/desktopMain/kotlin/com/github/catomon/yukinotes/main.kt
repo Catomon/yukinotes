@@ -1,6 +1,5 @@
 package com.github.catomon.yukinotes
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -39,8 +38,6 @@ fun WindowScope.App() {
 @Composable
 fun WindowScope.MainFrame() {
     WindowDraggableArea {
-        Column {
-            YukiApp()
-        }
+        YukiApp()
     }
 }

@@ -88,8 +88,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":composeApp"))
-    implementation(project(":composeApp"))
     debugImplementation(compose.uiTooling)
 }
 

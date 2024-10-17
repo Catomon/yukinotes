@@ -11,9 +11,16 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        context2 = this
         setContent {
             YukiApp()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        context2 = null
     }
 }
 

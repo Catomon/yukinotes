@@ -87,8 +87,10 @@ fun YukiApp() {
     MaterialTheme(
         yukiColors
     ) {
-        TopBar()
-        NotesScreen(appState)
+        Column {
+            TopBar()
+            NotesScreen(appState)
+        }
     }
 }
 

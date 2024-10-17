@@ -1,10 +1,17 @@
 package com.github.catomon.yukinotes
 
-import androidx.room.RoomDatabaseConstructor
+import android.content.Context
+import androidx.room.Room
 import com.github.catomon.yukinotes.data.database.YukiDatabase
 
 actual val userFolderPath: String = ""
 
+var context2: Context? = null
+
 actual fun createDatabase(): YukiDatabase {
-    TODO("Not yet implemented")
+    val room = Room.databaseBuilder<YukiDatabase>(
+        context2!!,
+        userFolderPath + "yuki_database.db"
+    ).build()
+    return room
 }
