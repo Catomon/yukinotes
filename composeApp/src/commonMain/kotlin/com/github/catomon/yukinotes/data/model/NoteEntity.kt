@@ -9,5 +9,8 @@ import kotlin.uuid.Uuid
 data class NoteEntity @OptIn(ExperimentalUuidApi::class) constructor(
     @PrimaryKey(autoGenerate = false) val id: Uuid,
     val title: String,
-    val content: String
+    val content: String,
+    val createdAt: Long = 0,
+    val updatedAt: Long = 0,
+    val isPinned: Boolean = false
 )

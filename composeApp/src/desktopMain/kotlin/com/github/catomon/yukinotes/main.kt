@@ -30,13 +30,6 @@ fun main() = application {
 @Composable
 @Preview
 fun WindowScope.App() {
-    MaterialTheme {
-        MainFrame()
-    }
-}
-
-@Composable
-fun WindowScope.MainFrame() {
     WindowDraggableArea {
         YukiApp()
     }

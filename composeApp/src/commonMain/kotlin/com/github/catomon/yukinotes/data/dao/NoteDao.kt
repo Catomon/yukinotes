@@ -8,6 +8,7 @@ import androidx.room.Query
 import androidx.room.Update
 import com.github.catomon.yukinotes.data.model.NoteEntity
 import kotlinx.coroutines.flow.Flow
+import kotlin.uuid.Uuid
 
 @Dao
 interface NoteDao {
@@ -21,9 +22,9 @@ interface NoteDao {
     @Delete
     suspend fun delete(note: NoteEntity)
 
-    @Query("SELECT * FROM notes ORDER BY id DESC")
+    @Query("SELECT * FROM notes ORDER BY updatedAt DESC")
     fun getAllNotes(): Flow<List<NoteEntity>>
 
     @Query("SELECT * FROM notes WHERE id = :id")
-    suspend fun getNoteById(id: Long): NoteEntity?
+    suspend fun getNoteById(id: Uuid): NoteEntity?
 }
