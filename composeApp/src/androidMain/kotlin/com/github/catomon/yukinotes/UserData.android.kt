@@ -9,9 +9,9 @@ actual val userFolderPath: String = ""
 var context2: Context? = null
 
 actual fun createDatabase(): YukiDatabase {
-    val room = Room.databaseBuilder<YukiDatabase>(
-        context2!!,
-        userFolderPath + "yuki_database.db"
-    ).build()
+    val room = Room
+        .databaseBuilder<YukiDatabase>(context2!!, userFolderPath + "yuki_database.db")
+        .fallbackToDestructiveMigration(false)
+        .build()
     return room
 }

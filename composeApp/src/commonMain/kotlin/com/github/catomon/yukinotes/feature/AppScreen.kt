@@ -20,7 +20,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
@@ -29,6 +28,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -58,57 +58,42 @@ import kotlin.uuid.Uuid
 @Preview
 fun YukiApp() {
     val appState = remember { AppState() }
-    var colors = remember { YukiTheme.createYukiColors() }
+    val navController: NavHostController = rememberNavController()
 
-    MaterialTheme(
-        colors
-    ) {
+    YukiTheme {
         Column {
             TopBar()
-            NotesScreen(appState)
+
+            NavHost(
+                navController,
+                startDestination = Routes.NOTES,
+                modifier = Modifier.fillMaxSize(),
+                enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left) },
+                exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right) }
+            ) {
+                composable(Routes.NOTES) {
+                    NotesScreen(appState, navController)
+                }
+
+                composable(Routes.EDIT_NOTE) { backStackEntry ->
+                    val noteId = backStackEntry.arguments?.getString(RouteArgs.NOTE_ID) ?: throw IllegalStateException("${RouteArgs.NOTE_ID} argument is missing")
+                    NoteCreationScreen(
+                        appState,
+                        if (noteId == "null") null else noteId,
+                        navBack = {
+                            navController.popBackStack(
+                                Routes.NOTES,
+                                inclusive = false
+                            )
+                        })
+                }
+            }
         }
     }
 }
 
 @Composable
-fun NotesScreen(appState: AppState, navController: NavHostController = rememberNavController()) {
-    NavHost(
-        navController,
-        startDestination = AppScreen.Notes.name,
-        modifier = Modifier.fillMaxSize(),
-        enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left) },
-        exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right) }
-    ) {
-        composable(AppScreen.Notes.name) {
-            NotesFrame(appState, navController)
-        }
-
-        composable(AppScreen.NewNote.name) {
-            NoteCreationFrame(
-                appState,
-                navToNotesScreen = {
-                    navController.popBackStack(
-                        AppScreen.Notes.name,
-                        inclusive = false
-                    )
-                })
-        }
-
-        composable(AppScreen.EditNote.name) {
-            NoteCreationFrame(
-                appState,
-                navToNotesScreen = {
-                    navController.popBackStack(
-                        AppScreen.Notes.name,
-                        inclusive = false
-                    )
-                })
-        }
-    }
-}
-
-@Composable
-fun NotesFrame(appState: AppState, navController: NavHostController) {
+fun NotesScreen(appState: AppState, navController: NavHostController) {
     val notes = appState.database.noteDao().getAllNotes().collectAsState(emptyList())
 
     var selectedNoteIndex by remember { appState.selectedNoteIndex }
@@ -157,13 +142,16 @@ fun NotesFrame(appState: AppState, navController: NavHostController) {
                 AnimatedVisibility(note != null) {
                     EditNoteButton {
                         if (note != null) {
-                            appState.editNote.value = note
-                            navController.navigate(AppScreen.EditNote)
+                            navController.navigate(
+                                Routes.createRoute(Routes.EDIT_NOTE, note.id.toString())
+                            )
                         }
                     }
                 }
                 NoteCreateButton {
-                    navController.navigate(AppScreen.NewNote)
+                    navController.navigate(
+                        Routes.createRoute(Routes.EDIT_NOTE, RouteArgs.NULL)
+                    )
                 }
             }
         }
@@ -237,13 +225,26 @@ fun NoteCreateButton(onClick: () -> Unit) {
 }
 
 @Composable
-fun NoteCreationFrame(appState: AppState, navToNotesScreen: () -> Unit) {
+fun NoteCreationScreen(appState: AppState, noteId: String? = null, navBack: () -> Unit) {
     val coroutineScope = rememberCoroutineScope()
 
-    var note by remember { appState.editNote }
+    var note by remember { mutableStateOf<Note?>(null) }
 
-    var title by remember { mutableStateOf(note?.title ?: "") }
-    var content by remember { mutableStateOf(note?.content ?: "") }
+    LaunchedEffect(null) {
+        if (noteId != null) {
+            appState.database.noteDao().getNoteById(Uuid.parse(noteId))?.toNote()?.let {
+                note = it
+            }
+        }
+    }
+
+    var title by remember { mutableStateOf("") }
+    var content by remember { mutableStateOf("") }
+
+    LaunchedEffect(note) {
+        title = note?.title ?: ""
+        content = note?.content ?: ""
+    }
 
     Column(
         Modifier.fillMaxSize(),
@@ -268,8 +269,7 @@ fun NoteCreationFrame(appState: AppState, navToNotesScreen: () -> Unit) {
 
         Row {
             TextButton({
-                navToNotesScreen()
-                note = null
+                navBack()
             }) {
                 Text("Cancel")
             }
@@ -289,9 +289,7 @@ fun NoteCreationFrame(appState: AppState, navToNotesScreen: () -> Unit) {
                             )
                         )
 
-                        navToNotesScreen()
-
-                        note = null
+                        navBack()
                     }
                 }
             }) {
