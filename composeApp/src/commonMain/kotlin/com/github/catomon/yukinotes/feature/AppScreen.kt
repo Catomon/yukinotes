@@ -31,6 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -43,7 +44,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.github.catomon.yukinotes.createDatabase
 import com.github.catomon.yukinotes.data.mappers.toNote
+import com.github.catomon.yukinotes.data.repository.YukiRepositoryImpl
 import com.github.catomon.yukinotes.domain.Note
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
@@ -57,7 +60,7 @@ import kotlin.uuid.Uuid
 @Composable
 @Preview
 fun YukiApp() {
-    val appState = remember { AppState() }
+    val appState = remember { AppState(YukiRepositoryImpl(createDatabase().noteDao())) }
     val navController: NavHostController = rememberNavController()
 
     YukiTheme {
@@ -76,7 +79,8 @@ fun YukiApp() {
                 }
 
                 composable(Routes.EDIT_NOTE) { backStackEntry ->
-                    val noteId = backStackEntry.arguments?.getString(RouteArgs.NOTE_ID) ?: throw IllegalStateException("${RouteArgs.NOTE_ID} argument is missing")
+                    val noteId = backStackEntry.arguments?.getString(RouteArgs.NOTE_ID)
+                        ?: throw IllegalStateException("${RouteArgs.NOTE_ID} argument is missing")
                     NoteCreationScreen(
                         appState,
                         if (noteId == "null") null else noteId,
@@ -94,9 +98,9 @@ fun YukiApp() {
 
 @Composable
 fun NotesScreen(appState: AppState, navController: NavHostController) {
-    val notes = appState.database.noteDao().getAllNotes().collectAsState(emptyList())
-
-    var selectedNoteIndex by remember { appState.selectedNoteIndex }
+    val notes = appState.repository.getAll().collectAsState(emptyList())
+    var selectedNoteIndex by remember { mutableIntStateOf(-1) }
+    val coroutineScope = rememberCoroutineScope()
 
     Box(Modifier.background(color = Color.White).fillMaxSize().clickable(
         interactionSource = remember { MutableInteractionSource() },
@@ -136,7 +140,14 @@ fun NotesScreen(appState: AppState, navController: NavHostController) {
         ) {
             val note = notes.value.getOrNull(selectedNoteIndex)?.toNote()
             AnimatedVisibility(note != null) {
-                RemoveNoteButton(appState, note)
+                RemoveNoteButton(appState) {
+                    if (note != null) {
+                        coroutineScope.launch {
+                            appState.removeNote(note)
+                            selectedNoteIndex = -1
+                        }
+                    }
+                }
             }
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 AnimatedVisibility(note != null) {
@@ -171,18 +182,9 @@ fun EditNoteButton(onClick: () -> Unit) {
 }
 
 @Composable
-fun RemoveNoteButton(appState: AppState, note: Note?) {
-    val coroutineScope = rememberCoroutineScope()
-
+fun RemoveNoteButton(appState: AppState, onClick: () -> Unit) {
     Button(
-        onClick = {
-            if (note != null) {
-                coroutineScope.launch {
-                    appState.removeNote(note)
-                    appState.selectedNoteIndex.value = -1
-                }
-            }
-        },
+        onClick = onClick,
         shape = CircleShape,
         colors = ButtonDefaults.buttonColors(backgroundColor = Colors.yukiHair),
         modifier = Modifier.size(48.dp)
@@ -232,7 +234,7 @@ fun NoteCreationScreen(appState: AppState, noteId: String? = null, navBack: () -
 
     LaunchedEffect(null) {
         if (noteId != null) {
-            appState.database.noteDao().getNoteById(Uuid.parse(noteId))?.toNote()?.let {
+            appState.repository.getById(Uuid.parse(noteId))?.toNote()?.let {
                 note = it
             }
         }
