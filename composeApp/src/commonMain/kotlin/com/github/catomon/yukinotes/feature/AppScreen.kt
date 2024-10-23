@@ -2,6 +2,7 @@ package com.github.catomon.yukinotes.feature
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
@@ -100,7 +102,7 @@ fun NotesScreen(yukiViewModel: YukiViewModel, navController: NavHostController) 
     val notes = yukiViewModel.repository.getAll().collectAsState(emptyList())
     var selectedNoteId by remember { mutableStateOf<Uuid?>(null) }
 
-    Box(Modifier.background(color = Color.White).fillMaxSize().clickable(
+    Box(Modifier.background(color = Colors.yukiEyes).fillMaxSize().clickable(
         interactionSource = remember { MutableInteractionSource() },
         indication = null
     ) {
@@ -110,23 +112,21 @@ fun NotesScreen(yukiViewModel: YukiViewModel, navController: NavHostController) 
             items(notes.value.size) {
                 val note = notes.value[it]
 
-                if (selectedNoteId == note.id) {
-                    Column(Modifier.fillMaxWidth()) {
-                        Text(note.title, modifier = Modifier.clickable {
-                            selectedNoteId = if (selectedNoteId != note.id) note.id else null
-                        }.fillMaxSize().background(Colors.yukiEyes).padding(start = 8.dp))
-
-                        if (note.content.isNotEmpty())
-                            Text(
-                                note.content,
-                                modifier = Modifier.fillMaxWidth().padding(start = 16.dp),
-                                color = Color.Gray
-                            )
-                    }
-                } else {
+                Column(
+                    Modifier.fillMaxWidth().padding(1.dp)
+                        .background(color = Color.White, shape = RoundedCornerShape(4.dp))
+                        .padding(start = 8.dp).animateContentSize()
+                ) {
                     Text(note.title, modifier = Modifier.clickable {
-                        selectedNoteId = note.id
-                    }.fillMaxSize().padding(start = 8.dp))
+                        selectedNoteId = if (selectedNoteId != note.id) note.id else null
+                    }.fillMaxSize())
+
+                    if (selectedNoteId == note.id && note.content.isNotEmpty() && note.content.isNotBlank())
+                        Text(
+                            note.content,
+                            modifier = Modifier.fillMaxWidth().padding(start = 16.dp),
+                            color = Color.Gray
+                        )
                 }
             }
         }

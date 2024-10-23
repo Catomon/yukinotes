@@ -17,6 +17,7 @@ object Colors {
     val yukiEyes = Color(134, 105, 189)
     val yukiEyesDark = Color(50, 23, 131)
     val yukiRed = Color(200, 33, 20)
+    val lightGrey = Color(230, 230, 230)
 
     val yukiColors = androidx.compose.material.Colors(
         primary = yukiHair,
