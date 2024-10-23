@@ -31,15 +31,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -48,7 +47,6 @@ import com.github.catomon.yukinotes.createDatabase
 import com.github.catomon.yukinotes.data.mappers.toNote
 import com.github.catomon.yukinotes.data.repository.YukiRepositoryImpl
 import com.github.catomon.yukinotes.domain.Note
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import yukinotes.composeapp.generated.resources.Res
@@ -60,7 +58,8 @@ import kotlin.uuid.Uuid
 @Composable
 @Preview
 fun YukiApp() {
-    val appState = remember { AppState(YukiRepositoryImpl(createDatabase().noteDao())) }
+    val yukiViewModel: YukiViewModel =
+        viewModel { YukiViewModel(YukiRepositoryImpl(createDatabase().noteDao())) }
     val navController: NavHostController = rememberNavController()
 
     YukiTheme {
@@ -75,14 +74,14 @@ fun YukiApp() {
                 exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right) }
             ) {
                 composable(Routes.NOTES) {
-                    NotesScreen(appState, navController)
+                    NotesScreen(yukiViewModel, navController)
                 }
 
                 composable(Routes.EDIT_NOTE) { backStackEntry ->
                     val noteId = backStackEntry.arguments?.getString(RouteArgs.NOTE_ID)
                         ?: throw IllegalStateException("${RouteArgs.NOTE_ID} argument is missing")
                     NoteCreationScreen(
-                        appState,
+                        yukiViewModel,
                         if (noteId == "null") null else noteId,
                         navBack = {
                             navController.popBackStack(
@@ -97,25 +96,24 @@ fun YukiApp() {
 }
 
 @Composable
-fun NotesScreen(appState: AppState, navController: NavHostController) {
-    val notes = appState.repository.getAll().collectAsState(emptyList())
-    var selectedNoteIndex by remember { mutableIntStateOf(-1) }
-    val coroutineScope = rememberCoroutineScope()
+fun NotesScreen(yukiViewModel: YukiViewModel, navController: NavHostController) {
+    val notes = yukiViewModel.repository.getAll().collectAsState(emptyList())
+    var selectedNoteId by remember { mutableStateOf<Uuid?>(null) }
 
     Box(Modifier.background(color = Color.White).fillMaxSize().clickable(
         interactionSource = remember { MutableInteractionSource() },
         indication = null
     ) {
-        selectedNoteIndex = -1
+        selectedNoteId = null
     }) {
         LazyColumn(modifier = Modifier.align(Alignment.TopStart)) {
             items(notes.value.size) {
-                if (selectedNoteIndex == it) {
-                    val note = notes.value[it]
+                val note = notes.value[it]
 
+                if (selectedNoteId == note.id) {
                     Column(Modifier.fillMaxWidth()) {
                         Text(note.title, modifier = Modifier.clickable {
-                            selectedNoteIndex = if (selectedNoteIndex != it) it else -1
+                            selectedNoteId = if (selectedNoteId != note.id) note.id else null
                         }.fillMaxSize().background(Colors.yukiEyes).padding(start = 8.dp))
 
                         if (note.content.isNotEmpty())
@@ -126,8 +124,8 @@ fun NotesScreen(appState: AppState, navController: NavHostController) {
                             )
                     }
                 } else {
-                    Text(notes.value[it].title, modifier = Modifier.clickable {
-                        selectedNoteIndex = it
+                    Text(note.title, modifier = Modifier.clickable {
+                        selectedNoteId = note.id
                     }.fillMaxSize().padding(start = 8.dp))
                 }
             }
@@ -138,14 +136,11 @@ fun NotesScreen(appState: AppState, navController: NavHostController) {
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.Bottom
         ) {
-            val note = notes.value.getOrNull(selectedNoteIndex)?.toNote()
+            val note = notes.value.find { it.id == selectedNoteId }?.toNote()
             AnimatedVisibility(note != null) {
-                RemoveNoteButton(appState) {
+                RemoveNoteButton {
                     if (note != null) {
-                        coroutineScope.launch {
-                            appState.removeNote(note)
-                            selectedNoteIndex = -1
-                        }
+                        yukiViewModel.removeNote(note)
                     }
                 }
             }
@@ -182,7 +177,7 @@ fun EditNoteButton(onClick: () -> Unit) {
 }
 
 @Composable
-fun RemoveNoteButton(appState: AppState, onClick: () -> Unit) {
+fun RemoveNoteButton(onClick: () -> Unit) {
     Button(
         onClick = onClick,
         shape = CircleShape,
@@ -227,14 +222,12 @@ fun NoteCreateButton(onClick: () -> Unit) {
 }
 
 @Composable
-fun NoteCreationScreen(appState: AppState, noteId: String? = null, navBack: () -> Unit) {
-    val coroutineScope = rememberCoroutineScope()
-
+fun NoteCreationScreen(yukiViewModel: YukiViewModel, noteId: String? = null, navBack: () -> Unit) {
     var note by remember { mutableStateOf<Note?>(null) }
 
     LaunchedEffect(null) {
         if (noteId != null) {
-            appState.repository.getById(Uuid.parse(noteId))?.toNote()?.let {
+            yukiViewModel.repository.getById(Uuid.parse(noteId))?.toNote()?.let {
                 note = it
             }
         }
@@ -278,21 +271,19 @@ fun NoteCreationScreen(appState: AppState, noteId: String? = null, navBack: () -
 
             Button({
                 if (title.isNotEmpty()) {
-                    coroutineScope.launch {
-                        val curTime =
-                            ZonedDateTime.now(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                        appState.addNote(
-                            Note(
-                                id = note?.id ?: Uuid.random(),
-                                title = title,
-                                content = content,
-                                createdAt = note?.createdAt ?: curTime,
-                                updatedAt = curTime,
-                            )
+                    val curTime =
+                        ZonedDateTime.now(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                    yukiViewModel.addNote(
+                        Note(
+                            id = note?.id ?: Uuid.random(),
+                            title = title,
+                            content = content,
+                            createdAt = note?.createdAt ?: curTime,
+                            updatedAt = curTime,
                         )
+                    )
 
-                        navBack()
-                    }
+                    navBack()
                 }
             }) {
                 Text("Save")
