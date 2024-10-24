@@ -40,17 +40,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.github.catomon.yukinotes.createDatabase
 import com.github.catomon.yukinotes.data.mappers.toNote
-import com.github.catomon.yukinotes.data.repository.YukiRepositoryImpl
 import com.github.catomon.yukinotes.domain.Note
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.java.KoinJavaComponent.get
 import yukinotes.composeapp.generated.resources.Res
 import yukinotes.composeapp.generated.resources.yuki
 import java.time.ZoneId
@@ -60,8 +58,7 @@ import kotlin.uuid.Uuid
 @Composable
 @Preview
 fun YukiApp() {
-    val yukiViewModel: YukiViewModel =
-        viewModel { YukiViewModel(YukiRepositoryImpl(createDatabase().noteDao())) }
+    val yukiViewModel: YukiViewModel = get(YukiViewModel::class.java)
     val navController: NavHostController = rememberNavController()
 
     YukiTheme {
@@ -99,7 +96,7 @@ fun YukiApp() {
 
 @Composable
 fun NotesScreen(yukiViewModel: YukiViewModel, navController: NavHostController) {
-    val notes = yukiViewModel.repository.getAll().collectAsState(emptyList())
+    val notes = yukiViewModel.getAllNotes().collectAsState(emptyList())
     var selectedNoteId by remember { mutableStateOf<Uuid?>(null) }
 
     Box(Modifier.background(color = Colors.yukiEyes).fillMaxSize().clickable(
@@ -113,19 +110,23 @@ fun NotesScreen(yukiViewModel: YukiViewModel, navController: NavHostController) 
                 val note = notes.value[it]
 
                 Column(
-                    Modifier.fillMaxWidth().padding(1.dp)
+                    Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            selectedNoteId = if (selectedNoteId != note.id) note.id else null
+                        }
+                        .padding(1.dp)
                         .background(color = Color.White, shape = RoundedCornerShape(4.dp))
-                        .padding(start = 8.dp).animateContentSize()
+                        .padding(start = 8.dp)
+                        .animateContentSize()
                 ) {
-                    Text(note.title, modifier = Modifier.clickable {
-                        selectedNoteId = if (selectedNoteId != note.id) note.id else null
-                    }.fillMaxSize())
+                    Text(note.title, modifier = Modifier.fillMaxSize())
 
                     if (selectedNoteId == note.id && note.content.isNotEmpty() && note.content.isNotBlank())
                         Text(
                             note.content,
                             modifier = Modifier.fillMaxWidth().padding(start = 16.dp),
-                            color = Color.Gray
+                            color = Color.DarkGray
                         )
                 }
             }
@@ -227,7 +228,7 @@ fun NoteCreationScreen(yukiViewModel: YukiViewModel, noteId: String? = null, nav
 
     LaunchedEffect(null) {
         if (noteId != null) {
-            yukiViewModel.repository.getById(Uuid.parse(noteId))?.toNote()?.let {
+            yukiViewModel.getNoteById(Uuid.parse(noteId))?.toNote()?.let {
                 note = it
             }
         }

@@ -1,13 +1,19 @@
 package com.github.catomon.yukinotes.feature
 
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
+import org.jetbrains.compose.resources.Font
+import yukinotes.composeapp.generated.resources.BadComic_Regular
+import yukinotes.composeapp.generated.resources.Res
 
 @Composable
 fun YukiTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colors = Colors.yukiColors,
+        typography = Typography(FontFamily(Font(Res.font.BadComic_Regular))),
         content = content
     )
 }
