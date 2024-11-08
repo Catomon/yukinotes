@@ -19,6 +19,10 @@ class YukiRepositoryImpl(private val noteDao: NoteDao) : YukiRepository {
         noteDao.delete(note)
     }
 
+    override suspend fun delete(noteId: Uuid) {
+        noteDao.delete(noteId)
+    }
+
     override fun getAll(): Flow<List<NoteEntity>> {
         return noteDao.getAllNotes()
     }

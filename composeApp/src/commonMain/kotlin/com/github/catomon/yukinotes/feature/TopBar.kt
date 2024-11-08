@@ -19,7 +19,7 @@ import yukinotes.composeapp.generated.resources.Res
 import yukinotes.composeapp.generated.resources.yuki
 
 @Composable
-fun TopBar() {
+fun TopBar(menuButtonClicked: () -> Unit) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
@@ -31,9 +31,7 @@ fun TopBar() {
 
         Spacer(Modifier.weight(2f))
 
-        TextButton(onClick = {
-
-        }, Modifier.size(32.dp)) {
+        TextButton(onClick = menuButtonClicked, Modifier.size(32.dp)) {
             Text("|||", color = Color.White)
         }
     }

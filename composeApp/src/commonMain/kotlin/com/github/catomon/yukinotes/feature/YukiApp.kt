@@ -1,6 +1,7 @@
 package com.github.catomon.yukinotes.feature
 
 import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -20,14 +21,21 @@ fun YukiApp() {
 
     YukiTheme {
         Column {
-            TopBar()
+            TopBar(menuButtonClicked = {
+                val currentRoute = navController.currentBackStackEntry?.destination?.route
+                if (currentRoute == Routes.SETTINGS) {
+                    navController.popBackStack()
+                } else {
+                    navController.navigate(Routes.SETTINGS)
+                }
+            })
 
             NavHost(
                 navController,
                 startDestination = Routes.NOTES,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().background(color = Colors.yukiEyes),
                 enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left) },
-                exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right) }
+                exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right) },
             ) {
                 composable(Routes.NOTES) {
                     NotesScreen(yukiViewModel, navController)
@@ -45,6 +53,15 @@ fun YukiApp() {
                                 inclusive = false
                             )
                         })
+                }
+
+                composable(Routes.SETTINGS) {
+                    SettingsScreen(yukiViewModel, navBack = {
+                        navController.popBackStack(
+                            Routes.NOTES,
+                            inclusive = false
+                        )
+                    })
                 }
             }
         }

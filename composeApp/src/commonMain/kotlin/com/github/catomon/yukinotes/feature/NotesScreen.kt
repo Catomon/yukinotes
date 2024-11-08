@@ -25,148 +25,162 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Divider
-import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.github.catomon.yukinotes.data.mappers.toNote
+import com.github.catomon.yukinotes.data.model.NoteEntity
+import kotlinx.coroutines.flow.Flow
 import kotlin.uuid.Uuid
+
+data class NotesScreenState(val notes: Flow<List<NoteEntity>>, val selectedNoteId: Uuid?, var alwaysShowDetails: Boolean = false)
 
 @Composable
 fun NotesScreen(yukiViewModel: YukiViewModel, navController: NavHostController) {
-    val notes = yukiViewModel.getAllNotes().collectAsState(emptyList())
-    var selectedNoteId by remember { mutableStateOf<Uuid?>(null) }
+    val state by yukiViewModel.notesScreenState.collectAsState()
 
     Box(Modifier.background(color = Colors.yukiEyes).fillMaxSize().padding(1.dp).clickable(
         interactionSource = remember { MutableInteractionSource() },
         indication = null
     ) {
-        selectedNoteId = null
+        yukiViewModel.selectNote(null)
     }) {
-        LazyColumn(modifier = Modifier.align(Alignment.TopStart)) {
-            items(notes.value.size) {
-                val note = notes.value[it]
+        NotesList(
+            state,
+            onNoteSelected = { noteId ->
+                yukiViewModel.selectNote(if (state.selectedNoteId != noteId) noteId else null)
+            },
+            modifier = Modifier.align(Alignment.TopStart)
+        )
 
-                Column(
-                    Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            selectedNoteId = if (selectedNoteId != note.id) note.id else null
-                        }
-                        .padding(1.dp)
-                        .background(color = when (selectedNoteId) {
-                            null, note.id -> Color.White
-                            else -> Color.Gray
-                        }, shape = RoundedCornerShape(4.dp))
-                        .padding(start = 8.dp)
-                        .animateContentSize()
-                ) {
-                    Text(note.title, modifier = Modifier.fillMaxSize(), maxLines = 3)
-
-                    if (selectedNoteId == note.id && note.content.isNotEmpty() && note.content.isNotBlank()) {
-                        Divider(thickness = 2.dp, modifier = Modifier.padding(end = 8.dp))
-
-                        Text(
-                            note.content,
-                            modifier = Modifier.fillMaxWidth(),
-                            color = Color.DarkGray,
-                            maxLines = 6
-                        )
-                    }
+        NoteActionButtons(
+            noteSelected = state.selectedNoteId != null,
+            removeNote = {
+                state.selectedNoteId?.let { selectedNoteId ->
+                    yukiViewModel.removeNote(selectedNoteId)
                 }
-            }
 
-            item {
-                Spacer(Modifier.size(64.dp))
-            }
-        }
-
-        Row(
-            Modifier.align(Alignment.BottomEnd).fillMaxWidth().padding(8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Bottom
-        ) {
-            val note = notes.value.find { it.id == selectedNoteId }?.toNote()
-
-            AnimatedVisibility(
-                note != null,
-                enter = fadeIn() + expandHorizontally(expandFrom = Alignment.Start),
-                exit = fadeOut() + shrinkHorizontally(shrinkTowards = Alignment.Start),
-            ) {
-                RemoveNoteButton {
-                    if (note != null) {
-                        yukiViewModel.removeNote(note)
-                    }
-                }
-            }
-
-            NoteCreateButton(Modifier.weight(1f).padding(horizontal = 8.dp)) {
+                yukiViewModel.selectNote(null)
+            },
+            createNote = {
                 navController.navigate(
                     Routes.createRoute(Routes.EDIT_NOTE, RouteArgs.NULL)
                 )
-            }
 
-            AnimatedVisibility(note != null) {
-                EditNoteButton {
-                    if (note != null) {
-                        navController.navigate(
-                            Routes.createRoute(Routes.EDIT_NOTE, note.id.toString())
-                        )
-                    }
+                yukiViewModel.selectNote(null)
+            },
+            editNote = {
+                state.selectedNoteId?.let { selectedNoteId ->
+                    navController.navigate(
+                        Routes.createRoute(Routes.EDIT_NOTE, selectedNoteId.toString())
+                    )
+                }
+            },
+            modifier = Modifier.align(Alignment.BottomEnd).height(64.dp)
+        )
+    }
+}
+
+@Composable
+fun NotesList(
+    state: NotesScreenState,
+    onNoteSelected: (Uuid) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val notes by state.notes.collectAsState(emptyList())
+    val selectedNoteId = state.selectedNoteId
+
+    LazyColumn(modifier = modifier) {
+        items(notes.size) {
+            val note = notes[it]
+
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .clickable(indication = null, interactionSource = remember { MutableInteractionSource() }, onClick = {
+                        onNoteSelected(note.id)
+                    })
+                    .padding(1.dp)
+                    .background(
+                        color = when (selectedNoteId) {
+                            null, note.id -> Color.White
+                            else -> Color.LightGray
+                        }, shape = RoundedCornerShape(4.dp)
+                    )
+                    .padding(start = 8.dp)
+                    .animateContentSize()
+            ) {
+                Text(note.title, modifier = Modifier.fillMaxSize().padding(vertical = 6.dp), maxLines = 3)
+
+                val showDetails = (selectedNoteId == note.id || state.alwaysShowDetails) && note.content.isNotEmpty() && note.content.isNotBlank()
+                if (showDetails) {
+                    Divider(thickness = 2.dp, modifier = Modifier.padding(end = 8.dp))
+
+                    Text(
+                        note.content,
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp),
+                        color = Color.DarkGray,
+                        maxLines = 6,
+                        fontSize = 12.sp
+                    )
                 }
             }
+        }
+
+        item {
+            Spacer(Modifier.size(64.dp))
         }
     }
 }
 
 @Composable
-fun NoteCreateButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        shape = CircleShape,
-        colors = ButtonDefaults.buttonColors(backgroundColor = Colors.yukiHair),
-        modifier = modifier.size(32.dp)
+fun NoteActionButtons(
+    noteSelected: Boolean,
+    removeNote: () -> Unit,
+    createNote: () -> Unit,
+    editNote: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier.fillMaxWidth().padding(8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.Bottom
     ) {
-        Text("create new")
-//        Icon(Icons.Default.Add, "Add Note", tint = Color.White)
+        AnimatedVisibility(
+            noteSelected,
+            enter = fadeIn() + expandHorizontally(expandFrom = Alignment.Start),
+            exit = fadeOut() + shrinkHorizontally(shrinkTowards = Alignment.Start),
+        ) {
+            NoteActionButton(onClick = removeNote, buttonText = "delete")
+        }
+
+        NoteActionButton(Modifier.weight(1f).padding(horizontal = 8.dp), onClick = createNote, buttonText = "create new")
+
+        AnimatedVisibility(noteSelected) {
+            NoteActionButton(onClick = editNote, buttonText = "edit")
+        }
     }
 }
 
 @Composable
-fun EditNoteButton(onClick: () -> Unit) {
+fun NoteActionButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    buttonText: String
+) {
     Button(
         onClick = onClick,
         shape = CircleShape,
         colors = ButtonDefaults.buttonColors(backgroundColor = Colors.yukiHair),
-        modifier = Modifier.height(32.dp)
+        modifier = modifier
     ) {
-        Text("edit")
-//        Icon(Icons.Default.Edit, "Edit Note", tint = Color.White)
-    }
-}
-
-@Composable
-fun RemoveNoteButton(onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        shape = CircleShape,
-        colors = ButtonDefaults.buttonColors(backgroundColor = Colors.yukiHair),
-        modifier = Modifier.height(32.dp)
-    ) {
-        Text("delete")
-//        Icon(Icons.Default.Delete, "Remove Note", tint = Color.White)
+        Text(buttonText)
     }
 }

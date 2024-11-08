@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -28,12 +27,12 @@ import kotlin.uuid.Uuid
 
 @Composable
 fun NoteCreationScreen(yukiViewModel: YukiViewModel, noteId: String? = null, navBack: () -> Unit) {
-    var note by remember { mutableStateOf<Note?>(null) }
+    var newNote by remember { mutableStateOf<Note?>(null) }
 
     LaunchedEffect(null) {
         if (noteId != null) {
             yukiViewModel.getNoteById(Uuid.parse(noteId))?.toNote()?.let {
-                note = it
+                newNote = it
             }
         }
     }
@@ -41,9 +40,9 @@ fun NoteCreationScreen(yukiViewModel: YukiViewModel, noteId: String? = null, nav
     var title by remember { mutableStateOf("") }
     var content by remember { mutableStateOf("") }
 
-    LaunchedEffect(note) {
-        title = note?.title ?: ""
-        content = note?.content ?: ""
+    LaunchedEffect(newNote) {
+        title = newNote?.title ?: ""
+        content = newNote?.content ?: ""
     }
 
     Column(
@@ -84,10 +83,10 @@ fun NoteCreationScreen(yukiViewModel: YukiViewModel, noteId: String? = null, nav
                         ZonedDateTime.now(ZoneId.systemDefault()).toInstant().toEpochMilli()
                     yukiViewModel.addNote(
                         Note(
-                            id = note?.id ?: Uuid.random(),
+                            id = newNote?.id ?: Uuid.random(),
                             title = title,
                             content = content,
-                            createdAt = note?.createdAt ?: curTime,
+                            createdAt = newNote?.createdAt ?: curTime,
                             updatedAt = curTime,
                         )
                     )

@@ -8,8 +8,9 @@ object RouteArgs {
 object Routes {
     const val NOTES = "notes"
     const val EDIT_NOTE = "editNote/{${RouteArgs.NOTE_ID}}"
+    const val SETTINGS = "settings"
 
     fun createRoute(route: String, vararg args: String) : String {
-        return route.substringBefore("/") + "/" + args.joinToString("/")
+        return if (args.isEmpty()) route else route.substringBefore("/") + "/" + args.joinToString("/")
     }
 }
