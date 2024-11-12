@@ -6,6 +6,7 @@ import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -19,13 +20,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -38,6 +43,12 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.github.catomon.yukinotes.data.model.NoteEntity
 import kotlinx.coroutines.flow.Flow
+import org.jetbrains.compose.resources.painterResource
+import yukinotes.composeapp.generated.resources.Res
+import yukinotes.composeapp.generated.resources.create_note
+import yukinotes.composeapp.generated.resources.delete_note
+import yukinotes.composeapp.generated.resources.edit_note
+import yukinotes.composeapp.generated.resources.snowflake
 import kotlin.uuid.Uuid
 
 data class NotesScreenState(val notes: Flow<List<NoteEntity>>, val selectedNoteId: Uuid?, var alwaysShowDetails: Boolean = false)
@@ -60,7 +71,8 @@ fun NotesScreen(yukiViewModel: YukiViewModel, navController: NavHostController) 
             modifier = Modifier.align(Alignment.TopStart)
         )
 
-        NoteActionButtons(
+        //was NoteActionButtons
+        BottomBar(
             noteSelected = state.selectedNoteId != null,
             removeNote = {
                 state.selectedNoteId?.let { selectedNoteId ->
@@ -83,7 +95,7 @@ fun NotesScreen(yukiViewModel: YukiViewModel, navController: NavHostController) 
                     )
                 }
             },
-            modifier = Modifier.align(Alignment.BottomEnd).height(64.dp)
+            modifier = Modifier.align(Alignment.BottomEnd).height(32.dp).fillMaxWidth()
         )
     }
 }
@@ -136,6 +148,33 @@ fun NotesList(
 
         item {
             Spacer(Modifier.size(64.dp))
+        }
+    }
+}
+
+@Composable
+fun BottomBar( noteSelected: Boolean,
+               removeNote: () -> Unit,
+               createNote: () -> Unit,
+               editNote: () -> Unit,
+               modifier: Modifier = Modifier) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.background(Colors.yukiHair)
+    ) {
+        AnimatedVisibility(
+            noteSelected,
+            enter = fadeIn() + expandHorizontally(expandFrom = Alignment.Start),
+            exit = fadeOut() + shrinkHorizontally(shrinkTowards = Alignment.Start),
+        ) {
+            Image(painterResource(Res.drawable.delete_note), "Delete Note", Modifier.height(32.dp).width(64.dp).clickable(onClick = removeNote).weight(0.2f))
+        }
+
+        Image(painterResource(Res.drawable.create_note), "Create Note", Modifier.height(32.dp).clickable(onClick = createNote).weight(0.6f))
+
+        AnimatedVisibility(noteSelected) {
+            Image(painterResource(Res.drawable.edit_note), "Edit Note", Modifier.height(32.dp).width(64.dp).clickable(onClick = editNote).weight(0.2f))
         }
     }
 }

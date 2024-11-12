@@ -10,6 +10,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -18,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.github.catomon.yukinotes.data.mappers.toNote
 import com.github.catomon.yukinotes.domain.Note
@@ -58,7 +60,8 @@ fun NoteCreationScreen(yukiViewModel: YukiViewModel, noteId: String? = null, nav
             },
             label = { Text("Title") },
             modifier = Modifier.fillMaxWidth(),
-            maxLines = 3
+            maxLines = 3,
+            colors = TextFieldDefaults.textFieldColors(textColor = Color.White)
         )
 
         TextField(
@@ -68,6 +71,7 @@ fun NoteCreationScreen(yukiViewModel: YukiViewModel, noteId: String? = null, nav
             },
             label = { Text("Details") },
             modifier = Modifier.fillMaxWidth().weight(0.5f),
+            colors = TextFieldDefaults.textFieldColors(textColor = Color.White)
         )
 
         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
