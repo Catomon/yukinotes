@@ -1,5 +1,6 @@
 package com.github.catomon.yukinotes.feature
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.expandHorizontally
@@ -27,14 +28,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,17 +46,30 @@ import com.github.catomon.yukinotes.data.model.NoteEntity
 import kotlinx.coroutines.flow.Flow
 import org.jetbrains.compose.resources.painterResource
 import yukinotes.composeapp.generated.resources.Res
+import yukinotes.composeapp.generated.resources.cancel
+import yukinotes.composeapp.generated.resources.confirm
 import yukinotes.composeapp.generated.resources.create_note
 import yukinotes.composeapp.generated.resources.delete_note
 import yukinotes.composeapp.generated.resources.edit_note
-import yukinotes.composeapp.generated.resources.snowflake
+import yukinotes.composeapp.generated.resources.trashcan
 import kotlin.uuid.Uuid
 
-data class NotesScreenState(val notes: Flow<List<NoteEntity>>, val selectedNoteId: Uuid?, var alwaysShowDetails: Boolean = false)
+data class NotesScreenState(
+    val notes: Flow<List<NoteEntity>>,
+    val selectedNoteId: Uuid?,
+    var alwaysShowDetails: Boolean = false,
+    var confirmDelete: Boolean = false
+)
 
 @Composable
 fun NotesScreen(yukiViewModel: YukiViewModel, navController: NavHostController) {
     val state by yukiViewModel.notesScreenState.collectAsState()
+
+    var showConfirmDeleteNote by remember { mutableStateOf(false) }
+
+    LaunchedEffect(state.selectedNoteId) {
+        showConfirmDeleteNote = false
+    }
 
     Box(Modifier.background(color = Colors.yukiEyes).fillMaxSize().padding(1.dp).clickable(
         interactionSource = remember { MutableInteractionSource() },
@@ -74,12 +88,19 @@ fun NotesScreen(yukiViewModel: YukiViewModel, navController: NavHostController) 
         //was NoteActionButtons
         BottomBar(
             noteSelected = state.selectedNoteId != null,
+            isShowConfirmDelete = showConfirmDeleteNote,
+            showRemoveConfirm = {
+                showConfirmDeleteNote = true
+            },
             removeNote = {
                 state.selectedNoteId?.let { selectedNoteId ->
                     yukiViewModel.removeNote(selectedNoteId)
                 }
 
                 yukiViewModel.selectNote(null)
+            },
+            cancelRemove = {
+                showConfirmDeleteNote = false
             },
             createNote = {
                 navController.navigate(
@@ -95,7 +116,7 @@ fun NotesScreen(yukiViewModel: YukiViewModel, navController: NavHostController) 
                     )
                 }
             },
-            modifier = Modifier.align(Alignment.BottomEnd).height(32.dp).fillMaxWidth()
+            modifier = Modifier.align(Alignment.BottomEnd).height(32.dp).fillMaxWidth(),
         )
     }
 }
@@ -116,9 +137,12 @@ fun NotesList(
             Column(
                 Modifier
                     .fillMaxWidth()
-                    .clickable(indication = null, interactionSource = remember { MutableInteractionSource() }, onClick = {
-                        onNoteSelected(note.id)
-                    })
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        onClick = {
+                            onNoteSelected(note.id)
+                        })
                     .padding(1.dp)
                     .background(
                         color = when (selectedNoteId) {
@@ -129,9 +153,14 @@ fun NotesList(
                     .padding(start = 8.dp)
                     .animateContentSize()
             ) {
-                Text(note.title, modifier = Modifier.fillMaxSize().padding(vertical = 6.dp), maxLines = 3)
+                Text(
+                    note.title,
+                    modifier = Modifier.fillMaxSize().padding(vertical = 6.dp),
+                    maxLines = 3
+                )
 
-                val showDetails = (selectedNoteId == note.id || state.alwaysShowDetails) && note.content.isNotEmpty() && note.content.isNotBlank()
+                val showDetails =
+                    (selectedNoteId == note.id || state.alwaysShowDetails) && note.content.isNotEmpty() && note.content.isNotBlank()
                 if (showDetails) {
                     Divider(thickness = 2.dp, modifier = Modifier.padding(end = 8.dp))
 
@@ -153,11 +182,16 @@ fun NotesList(
 }
 
 @Composable
-fun BottomBar( noteSelected: Boolean,
-               removeNote: () -> Unit,
-               createNote: () -> Unit,
-               editNote: () -> Unit,
-               modifier: Modifier = Modifier) {
+fun BottomBar(
+    noteSelected: Boolean,
+    isShowConfirmDelete: Boolean,
+    showRemoveConfirm: () -> Unit,
+    removeNote: () -> Unit,
+    cancelRemove: () -> Unit,
+    createNote: () -> Unit,
+    editNote: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
@@ -168,13 +202,48 @@ fun BottomBar( noteSelected: Boolean,
             enter = fadeIn() + expandHorizontally(expandFrom = Alignment.Start),
             exit = fadeOut() + shrinkHorizontally(shrinkTowards = Alignment.Start),
         ) {
-            Image(painterResource(Res.drawable.delete_note), "Delete Note", Modifier.height(32.dp).width(64.dp).clickable(onClick = removeNote).weight(0.2f))
+            AnimatedContent(isShowConfirmDelete && noteSelected) { showConfirmDeleteSelectedNote ->
+                if (showConfirmDeleteSelectedNote) {
+                    Row {
+                        Image(
+                            painterResource(Res.drawable.cancel),
+                            "Cancel Delete Note",
+                            Modifier.height(32.dp).width(64.dp).clickable(onClick = cancelRemove).weight(0.2f)
+                        )
+
+                        Image(painterResource(Res.drawable.trashcan),
+                            "Trashcan", modifier = Modifier.height(32.dp))
+
+                        Image(
+                            painterResource(Res.drawable.confirm),
+                            "Confirm Delete Note",
+                            Modifier.height(32.dp).width(64.dp).clickable(onClick = {
+                                removeNote()
+                            }).weight(0.2f)
+                        )
+                    }
+                } else {
+                    Image(
+                        painterResource(Res.drawable.delete_note),
+                        "Delete Note",
+                        Modifier.height(32.dp).width(64.dp).clickable(onClick = showRemoveConfirm).weight(0.2f)
+                    )
+                }
+            }
         }
 
-        Image(painterResource(Res.drawable.create_note), "Create Note", Modifier.height(32.dp).clickable(onClick = createNote).weight(0.6f))
+        Image(
+            painterResource(Res.drawable.create_note),
+            "Create Note",
+            Modifier.height(32.dp).clickable(onClick = createNote).weight(0.6f)
+        )
 
         AnimatedVisibility(noteSelected) {
-            Image(painterResource(Res.drawable.edit_note), "Edit Note", Modifier.height(32.dp).width(64.dp).clickable(onClick = editNote).weight(0.2f))
+            Image(
+                painterResource(Res.drawable.edit_note),
+                "Edit Note",
+                Modifier.height(32.dp).width(64.dp).clickable(onClick = editNote).weight(0.2f)
+            )
         }
     }
 }
@@ -200,7 +269,11 @@ fun NoteActionButtons(
             NoteActionButton(onClick = removeNote, buttonText = "delete")
         }
 
-        NoteActionButton(Modifier.weight(1f).padding(horizontal = 8.dp), onClick = createNote, buttonText = "create new")
+        NoteActionButton(
+            Modifier.weight(1f).padding(horizontal = 8.dp),
+            onClick = createNote,
+            buttonText = "create new"
+        )
 
         AnimatedVisibility(noteSelected) {
             NoteActionButton(onClick = editNote, buttonText = "edit")

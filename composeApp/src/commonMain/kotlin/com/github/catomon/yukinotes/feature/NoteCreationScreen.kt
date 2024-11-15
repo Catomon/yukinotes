@@ -1,11 +1,15 @@
 package com.github.catomon.yukinotes.feature
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -23,6 +27,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.github.catomon.yukinotes.data.mappers.toNote
 import com.github.catomon.yukinotes.domain.Note
+import org.jetbrains.compose.resources.painterResource
+import yukinotes.composeapp.generated.resources.Res
+import yukinotes.composeapp.generated.resources.cancel
+import yukinotes.composeapp.generated.resources.confirm
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import kotlin.uuid.Uuid
@@ -75,31 +83,33 @@ fun NoteCreationScreen(yukiViewModel: YukiViewModel, noteId: String? = null, nav
         )
 
         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-            TextButton({
-                navBack()
-            }) {
-                Text("Cancel")
-            }
+            Image(
+                painterResource(Res.drawable.cancel),
+                "Cancel Create Note",
+                Modifier.height(32.dp).width(64.dp).clickable(onClick = navBack).weight(0.2f)
+            )
 
-            Button({
-                if (title.isNotEmpty()) {
-                    val curTime =
-                        ZonedDateTime.now(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                    yukiViewModel.addNote(
-                        Note(
-                            id = newNote?.id ?: Uuid.random(),
-                            title = title,
-                            content = content,
-                            createdAt = newNote?.createdAt ?: curTime,
-                            updatedAt = curTime,
+            Image(
+                painterResource(Res.drawable.confirm),
+                "Confirm Create Note",
+                Modifier.height(32.dp).width(64.dp).clickable(onClick = {
+                    if (title.isNotEmpty()) {
+                        val curTime =
+                            ZonedDateTime.now(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                        yukiViewModel.addNote(
+                            Note(
+                                id = newNote?.id ?: Uuid.random(),
+                                title = title,
+                                content = content,
+                                createdAt = newNote?.createdAt ?: curTime,
+                                updatedAt = curTime,
+                            )
                         )
-                    )
 
-                    navBack()
-                }
-            }) {
-                Text("Save")
-            }
+                        navBack()
+                    }
+                }).weight(0.2f)
+            )
         }
     }
 }

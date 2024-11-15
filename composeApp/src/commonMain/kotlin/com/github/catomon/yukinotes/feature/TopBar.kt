@@ -2,6 +2,7 @@ package com.github.catomon.yukinotes.feature
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import yukinotes.composeapp.generated.resources.Res
+import yukinotes.composeapp.generated.resources.menu
 import yukinotes.composeapp.generated.resources.snowflake
 
 @Composable
@@ -31,8 +33,6 @@ fun TopBar(menuButtonClicked: () -> Unit) {
 
         Spacer(Modifier.weight(2f))
 
-        TextButton(onClick = menuButtonClicked, Modifier.size(32.dp)) {
-            Text("|||", color = Color.White)
-        }
+        Image(painterResource(Res.drawable.menu), "App Menu", Modifier.size(32.dp).clickable(onClick = menuButtonClicked))
     }
 }
