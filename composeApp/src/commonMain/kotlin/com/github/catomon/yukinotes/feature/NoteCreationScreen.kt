@@ -1,6 +1,7 @@
 package com.github.catomon.yukinotes.feature
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,9 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Button
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -50,26 +49,32 @@ fun NoteCreationScreen(yukiViewModel: YukiViewModel, noteId: String? = null, nav
     var title by remember { mutableStateOf("") }
     var content by remember { mutableStateOf("") }
 
+    var titleError by remember { mutableStateOf(false) }
+
     LaunchedEffect(newNote) {
         title = newNote?.title ?: ""
         content = newNote?.content ?: ""
     }
 
     Column(
-        Modifier.fillMaxSize().padding(start = 48.dp, end = 48.dp, top = 16.dp),
+        Modifier.fillMaxSize(),//.padding(start = 48.dp, end = 48.dp, top = 16.dp),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         TextField(
             value = title,
             onValueChange = {
                 if (it.length <= 320)
                     title = it
+
+                if (titleError)
+                    titleError = false
             },
             label = { Text("Title") },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(4.dp, 4.dp, 4.dp, 0.dp),
             maxLines = 3,
-            colors = TextFieldDefaults.textFieldColors(textColor = Color.White)
+            colors = TextFieldDefaults.textFieldColors(textColor = Color.White),
+            isError = titleError,
         )
 
         TextField(
@@ -78,38 +83,51 @@ fun NoteCreationScreen(yukiViewModel: YukiViewModel, noteId: String? = null, nav
                 content = it
             },
             label = { Text("Details") },
-            modifier = Modifier.fillMaxWidth().weight(0.5f),
+            modifier = Modifier.fillMaxWidth().weight(0.5f).padding(4.dp),
             colors = TextFieldDefaults.textFieldColors(textColor = Color.White)
         )
 
-        Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-            Image(
-                painterResource(Res.drawable.cancel),
-                "Cancel Create Note",
-                Modifier.height(32.dp).width(64.dp).clickable(onClick = navBack).weight(0.2f)
-            )
-
-            Image(
-                painterResource(Res.drawable.confirm),
-                "Confirm Create Note",
-                Modifier.height(32.dp).width(64.dp).clickable(onClick = {
-                    if (title.isNotEmpty()) {
-                        val curTime =
-                            ZonedDateTime.now(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                        yukiViewModel.addNote(
-                            Note(
-                                id = newNote?.id ?: Uuid.random(),
-                                title = title,
-                                content = content,
-                                createdAt = newNote?.createdAt ?: curTime,
-                                updatedAt = curTime,
-                            )
+        BottomBar(
+            onCancel = navBack,
+            onConfirm = {
+                if (title.isNotBlank()) {
+                    val curTime =
+                        ZonedDateTime.now(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                    yukiViewModel.addNote(
+                        Note(
+                            id = newNote?.id ?: Uuid.random(),
+                            title = title,
+                            content = content,
+                            createdAt = newNote?.createdAt ?: curTime,
+                            updatedAt = curTime,
                         )
+                    )
+                    navBack()
+                } else {
+                    titleError = true
+                }
+            }
+        )
+    }
+}
 
-                        navBack()
-                    }
-                }).weight(0.2f)
-            )
-        }
+@Composable
+fun BottomBar(onCancel: () -> Unit, onConfirm: () -> Unit, modifier: Modifier = Modifier) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.background(Colors.yukiHair)
+    ) {
+        Image(
+            painterResource(Res.drawable.cancel),
+            "Cancel Create Note",
+            Modifier.height(32.dp).width(64.dp).clickable(onClick = onCancel).weight(0.2f)
+        )
+
+        Image(
+            painterResource(Res.drawable.confirm),
+            "Confirm Create Note",
+            Modifier.height(32.dp).width(64.dp).clickable(onClick = onConfirm).weight(0.2f)
+        )
     }
 }
