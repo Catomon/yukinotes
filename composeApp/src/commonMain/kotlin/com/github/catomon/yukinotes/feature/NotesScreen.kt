@@ -19,9 +19,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -52,12 +54,15 @@ import yukinotes.composeapp.generated.resources.create_note
 import yukinotes.composeapp.generated.resources.delete_note
 import yukinotes.composeapp.generated.resources.edit_note
 import yukinotes.composeapp.generated.resources.trashcan
+import java.time.Instant
+import java.time.LocalDate
+import java.util.TimeZone
 import kotlin.uuid.Uuid
 
 data class NotesScreenState(
     val notes: Flow<List<NoteEntity>>,
     val selectedNoteId: Uuid?,
-    var alwaysShowDetails: Boolean = false,
+    var alwaysShowDetails: Boolean = true,
     var confirmDelete: Boolean = false
 )
 
@@ -71,7 +76,7 @@ fun NotesScreen(yukiViewModel: YukiViewModel, navController: NavHostController) 
         showConfirmDeleteNote = false
     }
 
-    Box(Modifier.background(color = Colors.yukiEyes).fillMaxSize().padding(1.dp).clickable(
+    Box(Modifier.background(color = Colors.background).fillMaxSize().clickable(
         interactionSource = remember { MutableInteractionSource() },
         indication = null
     ) {
@@ -82,10 +87,9 @@ fun NotesScreen(yukiViewModel: YukiViewModel, navController: NavHostController) 
             onNoteSelected = { noteId ->
                 yukiViewModel.selectNote(if (state.selectedNoteId != noteId) noteId else null)
             },
-            modifier = Modifier.align(Alignment.TopStart)
+            modifier = Modifier.align(Alignment.TopStart).padding(1.dp)
         )
 
-        //was NoteActionButtons
         BottomBar(
             noteSelected = state.selectedNoteId != null,
             isShowConfirmDelete = showConfirmDeleteNote,
@@ -162,11 +166,42 @@ fun NotesList(
                 val showDetails =
                     (selectedNoteId == note.id || state.alwaysShowDetails) && note.content.isNotEmpty() && note.content.isNotBlank()
                 if (showDetails) {
-                    Divider(thickness = 2.dp, modifier = Modifier.padding(end = 8.dp))
+                    Row {
+                        val formattedDate = remember(note.updatedAt) {
+                            val instant = Instant.ofEpochMilli(note.updatedAt)
+                            val userTimeZone = TimeZone.getDefault()
+                            val localDateTime = instant.atZone(userTimeZone.toZoneId())
+                            val year = localDateTime.year
+                            "${if (year != LocalDate.now().year) "$year." else ""}${
+                                localDateTime.monthValue.toString().padStart(2, '0')
+                            }.${localDateTime.dayOfMonth.toString().padStart(2, '0')}" + " " +
+                                    "${
+                                        localDateTime.hour.toString().padStart(2, '0')
+                                    }:${localDateTime.minute.toString().padStart(2, '0')}"
+                        }
+
+                        Divider(
+                            thickness = 2.dp,
+                            modifier = Modifier.weight(0.5f)
+                        )
+
+                        Text(
+                            formattedDate,
+                            modifier = Modifier.offset(y = (-14f).dp).wrapContentSize(),
+                            color = Color.Gray,
+                            maxLines = 1,
+                            fontSize = 10.sp
+                        )
+
+                        Divider(
+                            thickness = 2.dp,
+                            modifier = Modifier.padding(end = 8.dp).weight(0.04f)
+                        )
+                    }
 
                     Text(
                         note.content,
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp),
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp).offset(y = (-12f).dp),
                         color = Color.DarkGray,
                         maxLines = 6,
                         fontSize = 12.sp
@@ -208,11 +243,14 @@ fun BottomBar(
                         Image(
                             painterResource(Res.drawable.cancel),
                             "Cancel Delete Note",
-                            Modifier.height(32.dp).width(64.dp).clickable(onClick = cancelRemove).weight(0.2f)
+                            Modifier.height(32.dp).width(64.dp).clickable(onClick = cancelRemove)
+                                .weight(0.2f)
                         )
 
-                        Image(painterResource(Res.drawable.trashcan),
-                            "Trashcan", modifier = Modifier.height(32.dp))
+                        Image(
+                            painterResource(Res.drawable.trashcan),
+                            "Trashcan", modifier = Modifier.height(32.dp)
+                        )
 
                         Image(
                             painterResource(Res.drawable.confirm),
@@ -226,7 +264,8 @@ fun BottomBar(
                     Image(
                         painterResource(Res.drawable.delete_note),
                         "Delete Note",
-                        Modifier.height(32.dp).width(64.dp).clickable(onClick = showRemoveConfirm).weight(0.2f)
+                        Modifier.height(32.dp).width(64.dp).clickable(onClick = showRemoveConfirm)
+                            .weight(0.2f)
                     )
                 }
             }

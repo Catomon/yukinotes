@@ -42,7 +42,7 @@ fun SettingsScreen(
             })
         }
 
-        Text("ver 0.1", color = Color.White, modifier = Modifier.padding(start = 8.dp).align(Alignment.BottomStart))
+        Text("ver 1.1", color = Color.White, modifier = Modifier.padding(start = 8.dp).align(Alignment.BottomStart))
 
         Image(
             painterResource(Res.drawable.exit),

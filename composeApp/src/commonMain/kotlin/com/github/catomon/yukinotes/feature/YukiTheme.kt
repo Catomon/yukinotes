@@ -19,11 +19,16 @@ fun YukiTheme(content: @Composable () -> Unit) {
 }
 
 object Colors {
+//    val yukiHairOld = Color(255, 117, 236)
+//    val yukiRedOld = Color(200, 33, 20)
+
     val yukiHair = Color(249, 154, 181)
     val yukiEyes = Color(134, 105, 189)
     val yukiEyesDark = Color(50, 23, 131)
     val yukiRed = Color(245, 83, 95)
     val lightGrey = Color(230, 230, 230)
+
+    val background = yukiEyes
 
     val yukiColors = androidx.compose.material.Colors(
         primary = yukiHair,

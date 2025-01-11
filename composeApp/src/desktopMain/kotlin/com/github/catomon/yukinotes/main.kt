@@ -21,7 +21,7 @@ fun main() = application {
         modules(appModule)
     }
 
-    val windowState = WindowState(width = 400.dp, height = 600.dp)
+    val windowState = WindowState(width = 400.dp, height = 710.dp)
     Window(
         onCloseRequest = ::exitApplication,
         title = "Yuki Notes",

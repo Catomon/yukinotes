@@ -33,7 +33,7 @@ fun YukiApp() {
             NavHost(
                 navController,
                 startDestination = Routes.NOTES,
-                modifier = Modifier.fillMaxSize().background(color = Colors.yukiEyes),
+                modifier = Modifier.fillMaxSize().background(color = Colors.background),
                 enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left) },
                 exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right) },
             ) {
