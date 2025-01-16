@@ -9,6 +9,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -19,7 +20,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -40,29 +40,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.github.catomon.yukinotes.data.model.NoteEntity
+import com.github.catomon.yukinotes.epochMillisToSimpleDate
+import com.github.catomon.yukinotes.loadSettings
 import kotlinx.coroutines.flow.Flow
 import org.jetbrains.compose.resources.painterResource
-import yukinotes.composeapp.generated.resources.Res
-import yukinotes.composeapp.generated.resources.cancel
-import yukinotes.composeapp.generated.resources.confirm
-import yukinotes.composeapp.generated.resources.create_note
-import yukinotes.composeapp.generated.resources.delete_note
-import yukinotes.composeapp.generated.resources.edit_note
-import yukinotes.composeapp.generated.resources.trashcan
-import java.time.Instant
-import java.time.LocalDate
-import java.util.TimeZone
 import kotlin.uuid.Uuid
 
 data class NotesScreenState(
     val notes: Flow<List<NoteEntity>>,
     val selectedNoteId: Uuid?,
-    var alwaysShowDetails: Boolean = true,
+    var alwaysShowDetails: Boolean = loadSettings().alwaysShowDetails,
     var confirmDelete: Boolean = false
 )
 
@@ -87,7 +77,8 @@ fun NotesScreen(yukiViewModel: YukiViewModel, navController: NavHostController) 
             onNoteSelected = { noteId ->
                 yukiViewModel.selectNote(if (state.selectedNoteId != noteId) noteId else null)
             },
-            modifier = Modifier.align(Alignment.TopStart).padding(1.dp)
+            modifier = Modifier.align(Alignment.TopStart)
+                .padding(horizontal = sizes.notesListPadding)
         )
 
         BottomBar(
@@ -120,7 +111,8 @@ fun NotesScreen(yukiViewModel: YukiViewModel, navController: NavHostController) 
                     )
                 }
             },
-            modifier = Modifier.align(Alignment.BottomEnd).height(32.dp).fillMaxWidth(),
+            modifier = Modifier.align(Alignment.BottomEnd).height(sizes.bottomBarSize)
+                .fillMaxWidth(),
         )
     }
 }
@@ -135,83 +127,95 @@ fun NotesList(
     val selectedNoteId = state.selectedNoteId
 
     LazyColumn(modifier = modifier) {
+        item {
+            Spacer(Modifier.size(sizes.notesListPadding))
+        }
+
         items(notes.size) {
             val note = notes[it]
 
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .clickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() },
-                        onClick = {
-                            onNoteSelected(note.id)
-                        })
-                    .padding(1.dp)
-                    .background(
-                        color = when (selectedNoteId) {
-                            null, note.id -> Color.White
-                            else -> Color.LightGray
-                        }, shape = RoundedCornerShape(4.dp)
-                    )
-                    .padding(start = 8.dp)
-                    .animateContentSize()
-            ) {
-                Text(
-                    note.title,
-                    modifier = Modifier.fillMaxSize().padding(vertical = 6.dp),
-                    maxLines = 3
-                )
-
-                val showDetails =
-                    (selectedNoteId == note.id || state.alwaysShowDetails) && note.content.isNotEmpty() && note.content.isNotBlank()
-                if (showDetails) {
-                    Row {
-                        val formattedDate = remember(note.updatedAt) {
-                            val instant = Instant.ofEpochMilli(note.updatedAt)
-                            val userTimeZone = TimeZone.getDefault()
-                            val localDateTime = instant.atZone(userTimeZone.toZoneId())
-                            val year = localDateTime.year
-                            "${if (year != LocalDate.now().year) "$year." else ""}${
-                                localDateTime.monthValue.toString().padStart(2, '0')
-                            }.${localDateTime.dayOfMonth.toString().padStart(2, '0')}" + " " +
-                                    "${
-                                        localDateTime.hour.toString().padStart(2, '0')
-                                    }:${localDateTime.minute.toString().padStart(2, '0')}"
-                        }
-
-                        Divider(
-                            thickness = 2.dp,
-                            modifier = Modifier.weight(0.5f)
-                        )
-
-                        Text(
-                            formattedDate,
-                            modifier = Modifier.offset(y = (-14f).dp).wrapContentSize(),
-                            color = Color.Gray,
-                            maxLines = 1,
-                            fontSize = 10.sp
-                        )
-
-                        Divider(
-                            thickness = 2.dp,
-                            modifier = Modifier.padding(end = 8.dp).weight(0.04f)
-                        )
-                    }
-
-                    Text(
-                        note.content,
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp).offset(y = (-12f).dp),
-                        color = Color.DarkGray,
-                        maxLines = 6,
-                        fontSize = 12.sp
-                    )
-                }
-            }
+            NoteItem(onNoteSelected, note, selectedNoteId, state)
         }
 
         item {
             Spacer(Modifier.size(64.dp))
+        }
+    }
+}
+
+@Composable
+fun NoteItem(
+    onNoteSelected: (Uuid) -> Unit,
+    note: NoteEntity,
+    selectedNoteId: Uuid?,
+    state: NotesScreenState
+) {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() },
+                onClick = {
+                    onNoteSelected(note.id)
+                })
+            .padding(sizes.noteItemPadding)
+            .background(
+                color = Colors.noteBackground, shape = RoundedCornerShape(4.dp)
+            )
+            .let {
+                return@let if (selectedNoteId == note.id) {
+                    it.border(2.dp, color = Colors.primary, shape = RoundedCornerShape(4.dp))
+                } else it
+            }
+            .padding(start = 8.dp)
+            .animateContentSize()
+    ) {
+        Text(
+            note.title,
+            modifier = Modifier.fillMaxSize().padding(vertical = 6.dp),
+            maxLines = 3,
+            fontSize = sizes.fontHeadline,
+            color = Colors.noteTextHeadline
+        )
+
+        val showDetails =
+            (selectedNoteId == note.id || state.alwaysShowDetails) && note.content.isNotEmpty() && note.content.isNotBlank()
+        if (showDetails) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val formattedDate = remember(note.updatedAt) {
+                    epochMillisToSimpleDate(note.updatedAt)
+                }
+
+                Divider(
+                    thickness = sizes.dividerThickness,
+                    modifier = Modifier.weight(0.5f)
+                )
+
+                Text(
+                    formattedDate,
+                    modifier = Modifier.height(0.dp).wrapContentSize(unbounded = true)
+                        .padding(bottom = sizes.noteDatePadding),
+                    color = Colors.noteTextSmall,
+                    maxLines = 1,
+                    fontSize = sizes.fontSmall,
+                )
+
+                Divider(
+                    thickness = sizes.dividerThickness,
+                    modifier = Modifier.padding(end = 8.dp).weight(0.04f)
+                )
+            }
+
+            Text(
+                note.content,
+                modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp),
+                color = Colors.noteText,
+                maxLines = 6,
+                fontSize = sizes.font
+            )
         }
     }
 }
@@ -230,7 +234,7 @@ fun BottomBar(
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.background(Colors.yukiHair)
+        modifier = modifier.background(Colors.primary)
     ) {
         AnimatedVisibility(
             noteSelected,
@@ -241,19 +245,19 @@ fun BottomBar(
                 if (showConfirmDeleteSelectedNote) {
                     Row {
                         Image(
-                            painterResource(Res.drawable.cancel),
+                            painterResource(AppIcons.cancel),
                             "Cancel Delete Note",
                             Modifier.height(32.dp).width(64.dp).clickable(onClick = cancelRemove)
                                 .weight(0.2f)
                         )
 
                         Image(
-                            painterResource(Res.drawable.trashcan),
+                            painterResource(AppIcons.confirmDeleteNote),
                             "Trashcan", modifier = Modifier.height(32.dp)
                         )
 
                         Image(
-                            painterResource(Res.drawable.confirm),
+                            painterResource(AppIcons.confirm),
                             "Confirm Delete Note",
                             Modifier.height(32.dp).width(64.dp).clickable(onClick = {
                                 removeNote()
@@ -262,7 +266,7 @@ fun BottomBar(
                     }
                 } else {
                     Image(
-                        painterResource(Res.drawable.delete_note),
+                        painterResource(AppIcons.deleteNote),
                         "Delete Note",
                         Modifier.height(32.dp).width(64.dp).clickable(onClick = showRemoveConfirm)
                             .weight(0.2f)
@@ -272,14 +276,14 @@ fun BottomBar(
         }
 
         Image(
-            painterResource(Res.drawable.create_note),
+            painterResource(AppIcons.createNote),
             "Create Note",
             Modifier.height(32.dp).clickable(onClick = createNote).weight(0.6f)
         )
 
         AnimatedVisibility(noteSelected) {
             Image(
-                painterResource(Res.drawable.edit_note),
+                painterResource(AppIcons.editNote),
                 "Edit Note",
                 Modifier.height(32.dp).width(64.dp).clickable(onClick = editNote).weight(0.2f)
             )
@@ -329,7 +333,7 @@ fun NoteActionButton(
     Button(
         onClick = onClick,
         shape = CircleShape,
-        colors = ButtonDefaults.buttonColors(backgroundColor = Colors.yukiHair),
+        colors = ButtonDefaults.buttonColors(backgroundColor = Colors.primary),
         modifier = modifier
     ) {
         Text(buttonText)

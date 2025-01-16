@@ -5,6 +5,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -18,6 +23,13 @@ import org.koin.java.KoinJavaComponent.get
 fun YukiApp() {
     val yukiViewModel: YukiViewModel = get(YukiViewModel::class.java)
     val navController: NavHostController = rememberNavController()
+    val settings by yukiViewModel.userSettings
+    var topBarColor by remember { mutableStateOf(Colors.primary) }
+    LaunchedEffect(settings.theme) {
+        Colors.currentYukiTheme = settings.theme
+        Colors.updateTheme()
+        topBarColor = Colors.primary
+    }
 
     YukiTheme {
         Column {
@@ -28,7 +40,8 @@ fun YukiApp() {
                 } else {
                     navController.navigate(Routes.SETTINGS)
                 }
-            })
+            },
+                Modifier.background(topBarColor))
 
             NavHost(
                 navController,

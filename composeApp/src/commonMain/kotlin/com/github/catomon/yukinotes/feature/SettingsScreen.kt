@@ -9,11 +9,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.RadioButton
+import androidx.compose.material.RadioButtonDefaults
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,6 +33,8 @@ fun SettingsScreen(
     navBack: () -> Unit
 ) {
     val state by yukiViewModel.notesScreenState.collectAsState()
+    val settings by remember { yukiViewModel.userSettings }
+    val theme = settings.theme
 
     Box {
         Column(
@@ -37,17 +42,38 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.align(Alignment.Center).fillMaxSize()
         ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Theme", color = Color.White)
+                RadioButton(
+                    theme == Themes.DARK,
+                    colors = RadioButtonDefaults.colors(Color.Black, Color.Black),
+                    onClick = {
+                        yukiViewModel.updateUserSettings(settings.copy(theme = Themes.DARK))
+                    })
+                RadioButton(
+                    theme == Themes.BRIGHT,
+                    colors = RadioButtonDefaults.colors(Color.White, Color.White),
+                    onClick = {
+                        yukiViewModel.updateUserSettings(settings.copy(theme = Themes.BRIGHT))
+                    })
+            }
+
             SwitchSetting("Always show details", state.alwaysShowDetails, onCheckedChange = {
-                yukiViewModel.changeSettings(it)
+                yukiViewModel.alwaysShowDetails(it)
             })
         }
 
-        Text("ver 1.1", color = Color.White, modifier = Modifier.padding(start = 8.dp).align(Alignment.BottomStart))
+        Text(
+            "ver 1.2",
+            color = Color.White,
+            modifier = Modifier.padding(start = 8.dp).align(Alignment.BottomStart)
+        )
 
         Image(
             painterResource(Res.drawable.exit),
             "Exit App",
-            Modifier.padding(8.dp).size(32.dp).clickable(onClick = { exitProcess(0) }).align(Alignment.BottomEnd)
+            Modifier.padding(8.dp).size(32.dp).clickable(onClick = { exitProcess(0) })
+                .align(Alignment.BottomEnd)
 
         )
     }

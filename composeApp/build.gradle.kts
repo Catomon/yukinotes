@@ -9,6 +9,8 @@ plugins {
     alias(libs.plugins.compose.compiler)
 
     alias(libs.plugins.ksp)
+
+    kotlin("plugin.serialization") version "1.9.22"
 }
 
 kotlin {
@@ -50,6 +52,9 @@ kotlin {
             implementation(libs.sqlite.bundled)
             implementation(libs.navigation.compose)
             implementation(libs.koin.core)
+            //implementation(libs.datastore)
+            //implementation(libs.datastore.preferences)
+            implementation(libs.kotlinx.serialization.json)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -72,8 +77,8 @@ android {
         applicationId = "com.github.catomon.yukinotes"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 2
-        versionName = "1.1"
+        versionCode = 3
+        versionName = "1.2"
     }
     packaging {
         resources {
@@ -102,7 +107,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Msi) //TargetFormat.Dmg, TargetFormat.Deb
             packageName = "YukiNotes"
-            packageVersion = "1.1.0"
+            packageVersion = "1.2.0"
 
             //modules("java.compiler", "java.instrument", "java.naming", "java.scripting", "java.security.jgss", "java.sql", "jdk.management", "jdk.unsupported")
 

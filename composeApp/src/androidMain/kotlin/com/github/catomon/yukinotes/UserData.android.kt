@@ -3,6 +3,7 @@ package com.github.catomon.yukinotes
 import android.content.Context
 import androidx.room.Room
 import com.github.catomon.yukinotes.data.database.YukiDatabase
+import java.io.File
 
 actual val userFolderPath: String = ""
 
@@ -15,3 +16,5 @@ actual fun createDatabase(): YukiDatabase {
         .build()
     return room
 }
+
+actual val userDataFolder: File get() = File((mainActivityContext as MainActivity).filesDir.toURI())

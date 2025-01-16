@@ -1,8 +1,10 @@
 package com.github.catomon.yukinotes
 
 import androidx.compose.foundation.window.WindowDraggableArea
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowScope
@@ -15,6 +17,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.core.context.GlobalContext.startKoin
 import yukinotes.composeapp.generated.resources.Res
 import yukinotes.composeapp.generated.resources.yuki
+import java.awt.Window
 
 fun main() = application {
     startKoin {
@@ -29,8 +32,14 @@ fun main() = application {
         state = windowState,
         icon = painterResource(Res.drawable.yuki)
     ) {
-        App()
+        CompositionLocalProvider(LocalWindow provides this.window) {
+            App()
+        }
     }
+}
+
+val LocalWindow = compositionLocalOf<ComposeWindow> {
+    error("No window")
 }
 
 @Composable

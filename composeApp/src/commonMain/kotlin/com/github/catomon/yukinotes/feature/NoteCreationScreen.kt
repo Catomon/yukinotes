@@ -116,7 +116,7 @@ fun BottomBar(onCancel: () -> Unit, onConfirm: () -> Unit, modifier: Modifier = 
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.background(Colors.yukiHair)
+        modifier = modifier.background(Colors.primary)
     ) {
         Image(
             painterResource(Res.drawable.cancel),

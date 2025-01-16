@@ -9,30 +9,50 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.github.catomon.yukinotes.Const
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
-import yukinotes.composeapp.generated.resources.Res
-import yukinotes.composeapp.generated.resources.menu
-import yukinotes.composeapp.generated.resources.yuki
+
+expect object AppIcons {
+    val yuki: DrawableResource
+    val menu: DrawableResource
+    val createNote: DrawableResource
+    val deleteNote: DrawableResource
+    val editNote: DrawableResource
+    val confirmDeleteNote: DrawableResource
+    val confirm: DrawableResource
+    val cancel: DrawableResource
+}
 
 @Composable
-fun TopBar(menuButtonClicked: () -> Unit) {
+fun TopBar(menuButtonClicked: () -> Unit, modifier: Modifier = Modifier) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.background(Colors.yukiHair)
+        modifier = modifier
     ) {
-        Image(painterResource(Res.drawable.yuki), "App Icon", Modifier.size(32.dp))
+        Image(painterResource(AppIcons.yuki), "App Icon", Modifier.size(sizes.topBarSize))
 
-        Text("YukiNotes", color = Color.White, modifier = Modifier.padding(start = 8.dp))
+        Text(Const.APP_NAME, color = Color.White, modifier = Modifier.padding(start = 8.dp))
 
         Spacer(Modifier.weight(2f))
 
-        Image(painterResource(Res.drawable.menu), "App Menu", Modifier.size(32.dp).clickable(onClick = menuButtonClicked))
+        Row {
+            PlatformActionButton()
+
+            Image(
+                painterResource(AppIcons.menu),
+                "App Menu",
+                Modifier.size(sizes.topBarSize).clickable(onClick = menuButtonClicked)
+            )
+        }
     }
 }
+
+@Composable
+expect fun PlatformActionButton()

@@ -8,4 +8,6 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform) apply false
 
     alias(libs.plugins.ksp) apply false
+
+    kotlin("plugin.serialization") version "1.9.22" apply true
 }
