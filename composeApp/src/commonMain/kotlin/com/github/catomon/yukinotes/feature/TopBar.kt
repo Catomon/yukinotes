@@ -1,7 +1,6 @@
 package com.github.catomon.yukinotes.feature
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -18,8 +17,8 @@ import com.github.catomon.yukinotes.Const
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
-expect object AppIcons {
-    val yuki: DrawableResource
+expect object YukiIcons {
+    val appIcon: DrawableResource
     val menu: DrawableResource
     val createNote: DrawableResource
     val deleteNote: DrawableResource
@@ -36,7 +35,7 @@ fun TopBar(menuButtonClicked: () -> Unit, modifier: Modifier = Modifier) {
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
     ) {
-        Image(painterResource(AppIcons.yuki), "App Icon", Modifier.size(sizes.topBarSize))
+        Image(painterResource(YukiIcons.appIcon), "App Icon", Modifier.size(sizes.topBarSize))
 
         Text(Const.APP_NAME, color = Color.White, modifier = Modifier.padding(start = 8.dp))
 
@@ -46,7 +45,7 @@ fun TopBar(menuButtonClicked: () -> Unit, modifier: Modifier = Modifier) {
             PlatformActionButton()
 
             Image(
-                painterResource(AppIcons.menu),
+                painterResource(YukiIcons.menu),
                 "App Menu",
                 Modifier.size(sizes.topBarSize).clickable(onClick = menuButtonClicked)
             )

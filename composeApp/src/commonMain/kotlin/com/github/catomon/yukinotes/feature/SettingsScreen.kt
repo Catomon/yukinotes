@@ -34,7 +34,7 @@ fun SettingsScreen(
 ) {
     val state by yukiViewModel.notesScreenState.collectAsState()
     val settings by remember { yukiViewModel.userSettings }
-    val theme = settings.theme
+    val currentThemeName = settings.theme
 
     Box {
         Column(
@@ -44,18 +44,14 @@ fun SettingsScreen(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("Theme", color = Color.White)
-                RadioButton(
-                    theme == Themes.DARK,
-                    colors = RadioButtonDefaults.colors(Color.Black, Color.Black),
-                    onClick = {
-                        yukiViewModel.updateUserSettings(settings.copy(theme = Themes.DARK))
-                    })
-                RadioButton(
-                    theme == Themes.BRIGHT,
-                    colors = RadioButtonDefaults.colors(Color.White, Color.White),
-                    onClick = {
-                        yukiViewModel.updateUserSettings(settings.copy(theme = Themes.BRIGHT))
-                    })
+                Themes.list.forEachIndexed { i, theme ->
+                    RadioButton(
+                        currentThemeName == theme.name,
+                        colors = RadioButtonDefaults.colors(theme.surface, theme.surfaceSecondary),
+                        onClick = {
+                            yukiViewModel.updateUserSettings(settings.copy(theme = theme.name))
+                        })
+                }
             }
 
             SwitchSetting("Always show details", state.alwaysShowDetails, onCheckedChange = {
@@ -64,7 +60,7 @@ fun SettingsScreen(
         }
 
         Text(
-            "ver 1.2",
+            "mon scout, ver 1.3",
             color = Color.White,
             modifier = Modifier.padding(start = 8.dp).align(Alignment.BottomStart)
         )

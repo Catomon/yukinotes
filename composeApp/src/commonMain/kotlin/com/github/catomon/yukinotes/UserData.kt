@@ -43,6 +43,6 @@ fun loadSettings() : UserSettings {
 
 @Serializable
 data class UserSettings(
-    val theme: String = Themes.DARK,
+    val theme: String = Themes.list.first().name,
     val alwaysShowDetails: Boolean = true,
 )

@@ -16,8 +16,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.core.context.GlobalContext.startKoin
 import yukinotes.composeapp.generated.resources.Res
-import yukinotes.composeapp.generated.resources.yuki
-import java.awt.Window
+import yukinotes.composeapp.generated.resources.app_ico32
 
 fun main() = application {
     startKoin {
@@ -27,10 +26,10 @@ fun main() = application {
     val windowState = WindowState(width = 400.dp, height = 710.dp)
     Window(
         onCloseRequest = ::exitApplication,
-        title = "Yuki Notes",
+        title = "YukiNotes",
         undecorated = true,
         state = windowState,
-        icon = painterResource(Res.drawable.yuki)
+        icon = painterResource(Res.drawable.app_ico32)
     ) {
         CompositionLocalProvider(LocalWindow provides this.window) {
             App()

@@ -24,11 +24,11 @@ fun YukiApp() {
     val yukiViewModel: YukiViewModel = get(YukiViewModel::class.java)
     val navController: NavHostController = rememberNavController()
     val settings by yukiViewModel.userSettings
-    var topBarColor by remember { mutableStateOf(Colors.primary) }
+    var topBarColor by remember { mutableStateOf(Colors.bars) }
     LaunchedEffect(settings.theme) {
-        Colors.currentYukiTheme = settings.theme
+        Colors.currentYukiTheme = Themes.forNameOrFirst(settings.theme)
         Colors.updateTheme()
-        topBarColor = Colors.primary
+        topBarColor = Colors.bars
     }
 
     YukiTheme {

@@ -55,6 +55,7 @@ kotlin {
             //implementation(libs.datastore)
             //implementation(libs.datastore.preferences)
             implementation(libs.kotlinx.serialization.json)
+//            implementation(libs.androidx.ui.tooling)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -77,8 +78,8 @@ android {
         applicationId = "com.github.catomon.yukinotes"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 3
-        versionName = "1.2"
+        versionCode = 4
+        versionName = "1.3"
     }
     packaging {
         resources {
@@ -107,7 +108,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Msi) //TargetFormat.Dmg, TargetFormat.Deb
             packageName = "YukiNotes"
-            packageVersion = "1.2.0"
+            packageVersion = "1.3.0"
 
             //modules("java.compiler", "java.instrument", "java.naming", "java.scripting", "java.security.jgss", "java.sql", "jdk.management", "jdk.unsupported")
 
@@ -117,7 +118,7 @@ compose.desktop {
             }
 
             windows {
-                iconFile.set(project.file("yuki.ico"))
+                iconFile.set(project.file("app.ico"))
                 shortcut = true
             }
         }

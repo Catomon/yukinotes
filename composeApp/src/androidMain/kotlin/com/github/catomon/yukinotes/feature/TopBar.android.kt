@@ -9,15 +9,15 @@ import yukinotes.composeapp.generated.resources.create_note48
 import yukinotes.composeapp.generated.resources.delete_note48
 import yukinotes.composeapp.generated.resources.edit_note48
 import yukinotes.composeapp.generated.resources.menu48
+import yukinotes.composeapp.generated.resources.notepad_icon48
 import yukinotes.composeapp.generated.resources.trashcan48
-import yukinotes.composeapp.generated.resources.yuki48
 
 @Composable
 actual fun PlatformActionButton() {
 }
 
-actual object AppIcons {
-    actual val yuki: DrawableResource = Res.drawable.yuki48
+actual object YukiIcons {
+    actual val appIcon: DrawableResource = Res.drawable.notepad_icon48
     actual val menu: DrawableResource = Res.drawable.menu48
     actual val createNote: DrawableResource = Res.drawable.create_note48
     actual val deleteNote: DrawableResource = Res.drawable.delete_note48

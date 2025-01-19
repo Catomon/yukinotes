@@ -165,7 +165,7 @@ fun NoteItem(
             )
             .let {
                 return@let if (selectedNoteId == note.id) {
-                    it.border(2.dp, color = Colors.primary, shape = RoundedCornerShape(4.dp))
+                    it.border(2.dp, color = Colors.bars, shape = RoundedCornerShape(4.dp))
                 } else it
             }
             .padding(start = 8.dp)
@@ -191,7 +191,8 @@ fun NoteItem(
 
                 Divider(
                     thickness = sizes.dividerThickness,
-                    modifier = Modifier.weight(0.5f)
+                    modifier = Modifier.weight(0.5f),
+                    color = Colors.dividers
                 )
 
                 Text(
@@ -205,7 +206,8 @@ fun NoteItem(
 
                 Divider(
                     thickness = sizes.dividerThickness,
-                    modifier = Modifier.padding(end = 8.dp).weight(0.04f)
+                    modifier = Modifier.padding(end = 8.dp).weight(0.04f),
+                    color = Colors.dividers
                 )
             }
 
@@ -234,7 +236,7 @@ fun BottomBar(
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.background(Colors.primary)
+        modifier = modifier.background(Colors.bars)
     ) {
         AnimatedVisibility(
             noteSelected,
@@ -245,19 +247,19 @@ fun BottomBar(
                 if (showConfirmDeleteSelectedNote) {
                     Row {
                         Image(
-                            painterResource(AppIcons.cancel),
+                            painterResource(YukiIcons.cancel),
                             "Cancel Delete Note",
                             Modifier.height(32.dp).width(64.dp).clickable(onClick = cancelRemove)
                                 .weight(0.2f)
                         )
 
                         Image(
-                            painterResource(AppIcons.confirmDeleteNote),
+                            painterResource(YukiIcons.confirmDeleteNote),
                             "Trashcan", modifier = Modifier.height(32.dp)
                         )
 
                         Image(
-                            painterResource(AppIcons.confirm),
+                            painterResource(YukiIcons.confirm),
                             "Confirm Delete Note",
                             Modifier.height(32.dp).width(64.dp).clickable(onClick = {
                                 removeNote()
@@ -266,7 +268,7 @@ fun BottomBar(
                     }
                 } else {
                     Image(
-                        painterResource(AppIcons.deleteNote),
+                        painterResource(YukiIcons.deleteNote),
                         "Delete Note",
                         Modifier.height(32.dp).width(64.dp).clickable(onClick = showRemoveConfirm)
                             .weight(0.2f)
@@ -276,14 +278,14 @@ fun BottomBar(
         }
 
         Image(
-            painterResource(AppIcons.createNote),
+            painterResource(YukiIcons.createNote),
             "Create Note",
             Modifier.height(32.dp).clickable(onClick = createNote).weight(0.6f)
         )
 
         AnimatedVisibility(noteSelected) {
             Image(
-                painterResource(AppIcons.editNote),
+                painterResource(YukiIcons.editNote),
                 "Edit Note",
                 Modifier.height(32.dp).width(64.dp).clickable(onClick = editNote).weight(0.2f)
             )
@@ -333,7 +335,7 @@ fun NoteActionButton(
     Button(
         onClick = onClick,
         shape = CircleShape,
-        colors = ButtonDefaults.buttonColors(backgroundColor = Colors.primary),
+        colors = ButtonDefaults.buttonColors(backgroundColor = Colors.bars),
         modifier = modifier
     ) {
         Text(buttonText)
