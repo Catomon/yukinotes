@@ -64,7 +64,7 @@ fun NoteCreationScreen(yukiViewModel: YukiViewModel, noteId: String? = null, nav
         TextField(
             value = title,
             onValueChange = {
-                if (it.length <= 320)
+                if (it.length <= 255)
                     title = it
 
                 if (titleError)
@@ -72,7 +72,7 @@ fun NoteCreationScreen(yukiViewModel: YukiViewModel, noteId: String? = null, nav
             },
             label = { Text("Title") },
             modifier = Modifier.fillMaxWidth().padding(4.dp, 4.dp, 4.dp, 0.dp),
-            maxLines = 3,
+            maxLines = 1,
             colors = TextFieldDefaults.textFieldColors(textColor = Color.White),
             isError = titleError,
         )
@@ -106,7 +106,8 @@ fun NoteCreationScreen(yukiViewModel: YukiViewModel, noteId: String? = null, nav
                 } else {
                     titleError = true
                 }
-            }
+            },
+            modifier = Modifier.height(sizes.bottomBarSize)
         )
     }
 }

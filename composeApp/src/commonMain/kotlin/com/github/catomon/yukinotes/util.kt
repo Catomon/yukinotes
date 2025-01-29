@@ -1,5 +1,6 @@
 package com.github.catomon.yukinotes
 
+import com.github.catomon.yukinotes.data.model.NoteEntity
 import java.awt.Desktop
 import java.net.URI
 import java.time.Instant

@@ -6,12 +6,15 @@ import androidx.lifecycle.viewModelScope
 import com.github.catomon.yukinotes.UserSettings
 import com.github.catomon.yukinotes.data.model.NoteEntity
 import com.github.catomon.yukinotes.data.repository.YukiRepository
+import com.github.catomon.yukinotes.di.storeNotesAsTxtFiles
 import com.github.catomon.yukinotes.domain.Note
+import com.github.catomon.yukinotes.exportNotesAsTxt
 import com.github.catomon.yukinotes.loadSettings
 import com.github.catomon.yukinotes.saveSettings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlin.uuid.Uuid
 
@@ -27,6 +30,13 @@ class YukiViewModel(
     fun updateUserSettings(newSettings: UserSettings) {
         userSettings.value = newSettings
         saveSettings(newSettings)
+    }
+
+    fun setStoreAsTxt(storeAsTxt: Boolean) {
+        updateUserSettings(userSettings.value.copy(storeAsTxtFiles = storeAsTxt))
+        viewModelScope.launch {
+            exportNotesAsTxt(notesScreenState.value.notes.first())
+        }
     }
 
     fun alwaysShowDetails(alwaysShowDetails: Boolean = true) {
@@ -47,6 +57,7 @@ class YukiViewModel(
     fun removeNote(noteId: Uuid) {
         viewModelScope.launch {
             repository.delete(noteId)
+            if (storeNotesAsTxtFiles) _notesScreenState.value = _notesScreenState.value.copy(notes = repository.getAll())
         }
     }
 

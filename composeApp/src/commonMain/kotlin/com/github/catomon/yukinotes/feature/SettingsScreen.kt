@@ -9,31 +9,35 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.Checkbox
 import androidx.compose.material.RadioButton
 import androidx.compose.material.RadioButtonDefaults
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import com.github.catomon.yukinotes.userFolderPath
 import org.jetbrains.compose.resources.painterResource
-import org.koin.java.KoinJavaComponent.get
 import yukinotes.composeapp.generated.resources.Res
 import yukinotes.composeapp.generated.resources.exit
+import java.awt.Desktop
+import java.io.File
 import kotlin.system.exitProcess
 
 @Composable
 fun SettingsScreen(
-    yukiViewModel: YukiViewModel = get(YukiViewModel::class.java),
+    yukiViewModel: YukiViewModel,
     navBack: () -> Unit
 ) {
     val state by yukiViewModel.notesScreenState.collectAsState()
-    val settings by remember { yukiViewModel.userSettings }
+    val settings by yukiViewModel.userSettings
     val currentThemeName = settings.theme
 
     Box {
@@ -57,10 +61,32 @@ fun SettingsScreen(
             SwitchSetting("Always show details", state.alwaysShowDetails, onCheckedChange = {
                 yukiViewModel.alwaysShowDetails(it)
             })
+
+            //FIXME
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Store as .txt (restart needed)", color = Color.White)
+
+                Checkbox(settings.storeAsTxtFiles, onCheckedChange = {
+                    yukiViewModel.setStoreAsTxt(it)
+                })
+            }
+
+            //FIXME
+            if (settings.storeAsTxtFiles)
+                TextButton({
+                    val folder = File("$userFolderPath/notes/").also { it.mkdirs() }
+                    Desktop.getDesktop().open(folder.also { it.mkdirs() })
+                }) {
+                    Text(
+                        "Open notes folder",
+                        color = Color.White,
+                        textDecoration = TextDecoration.Underline
+                    )
+                }
         }
 
         Text(
-            "mon scout, ver 1.3",
+            "mon scout, ver 1.3.1",
             color = Color.White,
             modifier = Modifier.padding(start = 8.dp).align(Alignment.BottomStart)
         )

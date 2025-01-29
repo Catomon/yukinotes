@@ -16,9 +16,8 @@ import yukinotes.composeapp.generated.resources.delete_note
 import yukinotes.composeapp.generated.resources.edit_note
 import yukinotes.composeapp.generated.resources.menu
 import yukinotes.composeapp.generated.resources.minimize
-import yukinotes.composeapp.generated.resources.notepad_icon
+import yukinotes.composeapp.generated.resources.notepad_icon48
 import yukinotes.composeapp.generated.resources.trashcan
-import yukinotes.composeapp.generated.resources.yuki
 
 @Composable
 actual fun PlatformActionButton() {
@@ -33,7 +32,7 @@ actual fun PlatformActionButton() {
 }
 
 actual object YukiIcons {
-    actual val appIcon: DrawableResource = Res.drawable.notepad_icon
+    actual val appIcon: DrawableResource = Res.drawable.notepad_icon48
     actual val menu: DrawableResource = Res.drawable.menu
     actual val createNote: DrawableResource = Res.drawable.create_note
     actual val deleteNote: DrawableResource = Res.drawable.delete_note
