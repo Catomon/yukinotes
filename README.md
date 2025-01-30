@@ -1,2 +1,2 @@
 learning proj, simple notes app, Kotlin Multiplatform targeting Android, Desktop.
-![java_RmiZSqj60S](https://github.com/user-attachments/assets/b37aba5d-f4bf-4c88-b116-6c2ad1f2a574)
+![YukiNotes_vtQMYlCE4A](https://github.com/user-attachments/assets/0f5b8d5c-119e-4a5b-b3e5-445f6ab432b5)
