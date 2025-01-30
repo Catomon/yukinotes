@@ -5,11 +5,8 @@ import com.github.catomon.yukinotes.data.repository.YukiRepository
 import com.github.catomon.yukinotes.data.repository.YukiRepositoryImpl
 import com.github.catomon.yukinotes.data.repository.YukiTxtRepositoryImpl
 import com.github.catomon.yukinotes.feature.YukiViewModel
-import com.github.catomon.yukinotes.loadSettings
+import com.github.catomon.yukinotes.storeNotesAsTxtFiles
 import org.koin.dsl.module
-
-//FIXME
-val storeNotesAsTxtFiles by lazy { loadSettings().storeAsTxtFiles }
 
 val appModule = module {
     single<YukiRepository> { if (storeNotesAsTxtFiles) YukiTxtRepositoryImpl() else YukiRepositoryImpl(createDatabase().noteDao()) }

@@ -15,6 +15,8 @@ expect fun createDatabase(): YukiDatabase
 
 expect val userDataFolder: File
 
+val storeNotesAsTxtFiles by lazy { loadSettings().storeAsTxtFiles }
+
 suspend fun exportNotesAsTxt(notes: List<NoteEntity>) {
     val notesFolder = File("$userFolderPath/notes/")
     try {
