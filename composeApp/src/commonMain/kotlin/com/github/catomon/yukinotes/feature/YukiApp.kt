@@ -20,7 +20,7 @@ import org.koin.java.KoinJavaComponent.get
 
 @Composable
 @Preview
-fun YukiApp() {
+fun YukiApp(modifier: Modifier = Modifier) {
     val yukiViewModel: YukiViewModel = get(YukiViewModel::class.java)
     val navController: NavHostController = rememberNavController()
     val settings by yukiViewModel.userSettings
@@ -32,7 +32,7 @@ fun YukiApp() {
     }
 
     YukiTheme {
-        Column {
+        Column(modifier) {
             TopBar(menuButtonClicked = {
                 val currentRoute = navController.currentBackStackEntry?.destination?.route
                 if (currentRoute == Routes.SETTINGS) {

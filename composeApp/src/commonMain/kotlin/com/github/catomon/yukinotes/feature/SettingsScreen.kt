@@ -62,7 +62,7 @@ fun SettingsScreen(
         }
 
         Text(
-            "mon scout, ver 1.3.1",
+            "Sera Scout, ver 1.3.3",
             color = Color.White,
             modifier = Modifier.padding(start = 8.dp).align(Alignment.BottomStart)
         )

@@ -19,12 +19,12 @@ object Themes {
 
     class Pink : IYukiTheme {
         override val name: String = "yuki"
-        override val background = Color(0xffe96c76)
-        override val surface = Color(0xfff799b4)
-        override val surfaceSecondary = Color(0xffee8890)
+        override val background = Color(0xffee6b98)
+        override val surface = Color(0xfffd8ead)
+        override val surfaceSecondary = Color(0xfff87fa1)
         override val font = Color(0xFFFFFFFF)
-        override val fontSecondary = Color(0xFFFFE1EA)
-        override val bars = Color(0xffdc5c73)
+        override val fontSecondary = Color(0xffffdce6)
+        override val bars = Color(0xffee588c)
     }
 
     class Violet : IYukiTheme {

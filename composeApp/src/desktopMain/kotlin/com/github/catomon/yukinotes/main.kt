@@ -1,10 +1,13 @@
 package com.github.catomon.yukinotes
 
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowScope
@@ -18,16 +21,25 @@ import org.koin.core.context.GlobalContext.startKoin
 import yukinotes.composeapp.generated.resources.Res
 import yukinotes.composeapp.generated.resources.app_ico32
 
+var isOpenGl = false
 fun main() = application {
     startKoin {
         modules(appModule)
     }
 
-    val windowState = WindowState(width = 400.dp, height = 710.dp)
+    try {
+        System.setProperty("skiko.renderApi", "OPENGL")
+        isOpenGl = true
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+
+    val windowState = WindowState(width = 330.dp, height = 500.dp) //400 / 710
     Window(
         onCloseRequest = ::exitApplication,
         title = "YukiNotes",
         undecorated = true,
+        transparent = true,
         state = windowState,
         icon = painterResource(Res.drawable.app_ico32)
     ) {
@@ -45,6 +57,9 @@ val LocalWindow = compositionLocalOf<ComposeWindow> {
 @Preview
 fun WindowScope.App() {
     WindowDraggableArea {
-        YukiApp()
+        if (isOpenGl)
+            YukiApp(Modifier.clip(RoundedCornerShape(12.dp)))
+        else
+            YukiApp()
     }
 }

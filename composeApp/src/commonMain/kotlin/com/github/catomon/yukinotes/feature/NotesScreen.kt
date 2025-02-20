@@ -40,6 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.github.catomon.yukinotes.data.model.NoteEntity
@@ -165,7 +166,7 @@ fun NoteItem(
             )
             .let {
                 return@let if (selectedNoteId == note.id) {
-                    it.border(2.dp, color = Colors.bars, shape = RoundedCornerShape(4.dp))
+                    it.border(2.dp, color = Color.White, shape = RoundedCornerShape(4.dp))
                 } else it
             }
             .padding(start = 8.dp)

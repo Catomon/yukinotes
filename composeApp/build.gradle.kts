@@ -78,8 +78,8 @@ android {
         applicationId = "com.github.catomon.yukinotes"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 5
-        versionName = "1.3.1"
+        versionCode = 7
+        versionName = "1.3.3"
     }
     packaging {
         resources {
@@ -108,7 +108,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Msi) //TargetFormat.Dmg, TargetFormat.Deb
             packageName = "YukiNotes"
-            packageVersion = "1.3.1"
+            packageVersion = "1.3.3"
 
             //modules("java.compiler", "java.instrument", "java.naming", "java.scripting", "java.security.jgss", "java.sql", "jdk.management", "jdk.unsupported")
 
