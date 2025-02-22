@@ -23,7 +23,7 @@ object Themes {
         override val surface = Color(0xfffd8ead)
         override val surfaceSecondary = Color(0xfff87fa1)
         override val font = Color(0xFFFFFFFF)
-        override val fontSecondary = Color(0xffffdce6)
+        override val fontSecondary = Color(0xffffeef2)
         override val bars = Color(0xffee588c)
     }
 
@@ -83,7 +83,8 @@ object Colors {
     var dividers = Color(255, 148, 255)
 
     init {
-        currentYukiTheme = Themes.list.find { it.name == loadSettings().theme } ?: Themes.list.first()
+        currentYukiTheme =
+            Themes.list.find { it.name == loadSettings().theme } ?: Themes.list.first()
         updateTheme()
     }
 
