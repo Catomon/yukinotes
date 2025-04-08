@@ -1,17 +1,31 @@
 package com.github.catomon.yukinotes.feature
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
 import com.github.catomon.yukinotes.UserSettings
 import com.github.catomon.yukinotes.userFolderPath
 import java.awt.Desktop
 import java.io.File
+import java.net.URI
+
+@Composable
+actual fun OpenSourcesText(modifier: Modifier) {
+    Text(
+        "github.com/Catomon",
+        color = Color.White,
+        modifier = modifier.clickable {
+            Desktop.getDesktop().browse(URI("https://github.com/Catomon"))
+        }
+    )
+}
 
 @Composable
 actual fun StoreAsTextCheckbox(

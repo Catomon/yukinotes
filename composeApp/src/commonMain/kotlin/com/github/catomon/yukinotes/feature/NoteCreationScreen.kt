@@ -73,7 +73,7 @@ fun NoteCreationScreen(yukiViewModel: YukiViewModel, noteId: String? = null, nav
             label = { Text("Title") },
             modifier = Modifier.fillMaxWidth().padding(4.dp, 4.dp, 4.dp, 0.dp),
             maxLines = 1,
-            colors = TextFieldDefaults.textFieldColors(textColor = Color.White),
+            colors = TextFieldDefaults.textFieldColors(textColor = Color.White, cursorColor = Color.White),
             isError = titleError,
         )
 
@@ -84,7 +84,7 @@ fun NoteCreationScreen(yukiViewModel: YukiViewModel, noteId: String? = null, nav
             },
             label = { Text("Details") },
             modifier = Modifier.fillMaxWidth().weight(0.5f).padding(4.dp),
-            colors = TextFieldDefaults.textFieldColors(textColor = Color.White)
+            colors = TextFieldDefaults.textFieldColors(textColor = Color.White, cursorColor = Color.White)
         )
 
         BottomBar(

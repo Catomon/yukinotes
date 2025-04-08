@@ -61,11 +61,7 @@ fun SettingsScreen(
             StoreAsTextCheckbox(settings, yukiViewModel)
         }
 
-        Text(
-            "Sera Scout, ver 1.3.3",
-            color = Color.White,
-            modifier = Modifier.padding(start = 8.dp).align(Alignment.BottomStart)
-        )
+        OpenSourcesText(Modifier.padding(start = 8.dp).align(Alignment.BottomStart))
 
         Image(
             painterResource(Res.drawable.exit),
@@ -76,6 +72,9 @@ fun SettingsScreen(
         )
     }
 }
+
+@Composable
+expect fun OpenSourcesText(modifier: Modifier = Modifier)
 
 @Composable
 expect fun StoreAsTextCheckbox(

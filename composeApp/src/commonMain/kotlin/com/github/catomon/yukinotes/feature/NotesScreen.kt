@@ -15,6 +15,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,6 +27,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
@@ -73,11 +78,20 @@ fun NotesScreen(yukiViewModel: YukiViewModel, navController: NavHostController) 
     }
 
     Box(Modifier.background(color = Colors.background).fillMaxSize().clickable(
-        interactionSource = remember { MutableInteractionSource() },
-        indication = null
+        interactionSource = remember { MutableInteractionSource() }, indication = null
     ) {
         yukiViewModel.selectNote(null)
     }) {
+        if (true)
+            NotesStaggeredGrid(
+                state,
+                onNoteSelected = { noteId ->
+                    yukiViewModel.selectNote(if (state.selectedNoteId != noteId) noteId else null)
+                },
+                modifier = Modifier.align(Alignment.TopStart)
+                    .padding(horizontal = sizes.notesListPadding)
+            )
+        else
         NotesList(
             state,
             onNoteSelected = { noteId ->
@@ -124,10 +138,45 @@ fun NotesScreen(yukiViewModel: YukiViewModel, navController: NavHostController) 
 }
 
 @Composable
+fun NotesStaggeredGrid(
+    state: NotesScreenState, onNoteSelected: (Uuid) -> Unit, modifier: Modifier = Modifier
+) {
+    val notes by state.notes.collectAsState(emptyList())
+    val selectedNoteId = state.selectedNoteId
+    val gridState = rememberLazyStaggeredGridState()
+    val coroutineScope = rememberCoroutineScope()
+
+    LazyVerticalStaggeredGrid(
+        state = gridState,
+        columns = StaggeredGridCells.Adaptive(125.dp),
+        verticalItemSpacing = 2.dp,
+        horizontalArrangement = Arrangement.spacedBy(2.dp),
+        contentPadding = PaddingValues(
+            start = 0.dp,
+            top = 0.dp,
+            end = 0.dp,
+            bottom = 32.dp
+        ),
+        modifier = modifier
+    ) {
+        items(notes.size) { index ->
+            val note = notes[index]
+
+            NoteItem(
+                { uuid ->
+                    if (selectedNoteId == note.id) coroutineScope.launch {
+                        gridState.animateScrollToItem(index)
+                    }
+                    onNoteSelected(uuid)
+                }, note, selectedNoteId, state
+            )
+        }
+    }
+}
+
+@Composable
 fun NotesList(
-    state: NotesScreenState,
-    onNoteSelected: (Uuid) -> Unit,
-    modifier: Modifier = Modifier
+    state: NotesScreenState, onNoteSelected: (Uuid) -> Unit, modifier: Modifier = Modifier
 ) {
     val notes by state.notes.collectAsState(emptyList())
     val selectedNoteId = state.selectedNoteId
@@ -144,14 +193,11 @@ fun NotesList(
 
             NoteItem(
                 { uuid ->
-                    if (selectedNoteId == note.id)
-                        coroutineScope.launch {
-                            listState.animateScrollToItem(index)
-                        }
-
+                    if (selectedNoteId == note.id) coroutineScope.launch {
+                        listState.animateScrollToItem(index)
+                    }
                     onNoteSelected(uuid)
-                },
-                note, selectedNoteId, state
+                }, note, selectedNoteId, state
             )
         }
 
@@ -163,37 +209,24 @@ fun NotesList(
 
 @Composable
 fun NoteItem(
-    onNoteSelected: (Uuid) -> Unit,
-    note: NoteEntity,
-    selectedNoteId: Uuid?,
-    state: NotesScreenState
+    onNoteSelected: (Uuid) -> Unit, note: NoteEntity, selectedNoteId: Uuid?, state: NotesScreenState
 ) {
     var isContentOverflow by remember { mutableStateOf(false) }
     val showDetails =
         (selectedNoteId == note.id || state.alwaysShowDetails) && note.content.isNotEmpty() && note.content.isNotBlank()
 
     Box() {
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() },
-                    onClick = {
-                        onNoteSelected(note.id)
-                    })
-                .padding(sizes.noteItemPadding)
-                .background(
-                    color = Colors.noteBackground, shape = RoundedCornerShape(4.dp)
-                )
-                .let {
-                    return@let if (selectedNoteId == note.id) {
-                        it.border(2.dp, color = Color.White, shape = RoundedCornerShape(4.dp))
-                    } else it
-                }
-                .padding(start = 8.dp)
-                .animateContentSize()
-        ) {
+        Column(Modifier.fillMaxWidth().clickable(indication = null,
+                interactionSource = remember { MutableInteractionSource() },
+                onClick = {
+                    onNoteSelected(note.id)
+                }).padding(sizes.noteItemPadding).background(
+                color = Colors.noteBackground, shape = RoundedCornerShape(4.dp)
+            ).let {
+                return@let if (selectedNoteId == note.id) {
+                    it.border(2.dp, color = Color.White, shape = RoundedCornerShape(4.dp))
+                } else it
+            }.padding(start = 8.dp).animateContentSize()) {
             Text(
                 note.title,
                 modifier = Modifier.fillMaxSize().padding(vertical = 6.dp),
@@ -210,23 +243,17 @@ fun NoteItem(
                     color = Colors.dividers
                 )
 
-                Text(
-                    note.content,
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp).let {
-                        if (selectedNoteId == note.id) {
-                            it
-                        } else {
-                            it.requiredHeightIn(0.dp, 150.dp)
-                        }
-                    },
-                    color = Colors.noteText,
-//                    maxLines = 6,
-                    fontSize = sizes.font,
-                    overflow = TextOverflow.Ellipsis,
-                    onTextLayout = {
-                        isContentOverflow = it.hasVisualOverflow
+                Text(note.content, modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp).let {
+                    if (selectedNoteId == note.id) {
+                        it
+                    } else {
+                        it.requiredHeightIn(0.dp, 150.dp)
                     }
-                )
+                }, color = Colors.noteText,
+//                    maxLines = 6,
+                    fontSize = sizes.font, overflow = TextOverflow.Ellipsis, onTextLayout = {
+                        isContentOverflow = it.hasVisualOverflow
+                    })
             }
         }
 
@@ -293,7 +320,8 @@ fun BottomBar(
 
                         Image(
                             painterResource(YukiIcons.confirmDeleteNote),
-                            "Trashcan", modifier = Modifier.height(32.dp)
+                            "Trashcan",
+                            modifier = Modifier.height(32.dp)
                         )
 
                         Image(

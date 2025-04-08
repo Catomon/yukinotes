@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.github.catomon.yukinotes.Const
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -37,7 +38,7 @@ fun TopBar(menuButtonClicked: () -> Unit, modifier: Modifier = Modifier) {
     ) {
         Image(painterResource(YukiIcons.appIcon), "App Icon", Modifier.size(sizes.topBarSize))
 
-        Text(Const.APP_NAME, color = Color.White, modifier = Modifier.padding(start = 8.dp))
+        Text(Const.APP_NAME, color = Color.White, modifier = Modifier.padding(start = 8.dp), fontSize = 12.sp)
 
         Spacer(Modifier.weight(2f))
 

@@ -4,13 +4,17 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -33,15 +37,17 @@ fun YukiApp(modifier: Modifier = Modifier) {
 
     YukiTheme {
         Column(modifier) {
-            TopBar(menuButtonClicked = {
-                val currentRoute = navController.currentBackStackEntry?.destination?.route
-                if (currentRoute == Routes.SETTINGS) {
-                    navController.popBackStack()
-                } else {
-                    navController.navigate(Routes.SETTINGS)
-                }
-            },
-                Modifier.background(topBarColor))
+            TopBar(
+                menuButtonClicked = {
+                    val currentRoute = navController.currentBackStackEntry?.destination?.route
+                    if (currentRoute == Routes.SETTINGS) {
+                        navController.popBackStack()
+                    } else {
+                        navController.navigate(Routes.SETTINGS)
+                    }
+                },
+                Modifier.background(topBarColor)
+            )
 
             NavHost(
                 navController,
@@ -57,15 +63,23 @@ fun YukiApp(modifier: Modifier = Modifier) {
                 composable(Routes.EDIT_NOTE) { backStackEntry ->
                     val noteId = backStackEntry.arguments?.getString(RouteArgs.NOTE_ID)
                         ?: throw IllegalStateException("${RouteArgs.NOTE_ID} argument is missing")
-                    NoteCreationScreen(
-                        yukiViewModel,
-                        if (noteId == "null") null else noteId,
-                        navBack = {
-                            navController.popBackStack(
-                                Routes.NOTES,
-                                inclusive = false
-                            )
-                        })
+
+                    val customSelectionColors = TextSelectionColors(
+                        handleColor = Color.Gray,
+                        backgroundColor = Color.Black
+                    )
+
+                    CompositionLocalProvider(LocalTextSelectionColors provides customSelectionColors) {
+                        NoteCreationScreen(
+                            yukiViewModel,
+                            if (noteId == "null") null else noteId,
+                            navBack = {
+                                navController.popBackStack(
+                                    Routes.NOTES,
+                                    inclusive = false
+                                )
+                            })
+                    }
                 }
 
                 composable(Routes.SETTINGS) {
