@@ -1,12 +1,11 @@
 package com.github.catomon.yukinotes.ui
 
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Typography
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.unit.sp
 import com.github.catomon.yukinotes.loadSettings
 import org.jetbrains.compose.resources.Font
 import yukinotes.composeapp.generated.resources.BadComic_Regular
@@ -62,9 +61,33 @@ object Themes {
 
 @Composable
 fun YukiTheme(content: @Composable () -> Unit) {
+    val fontFamily = FontFamily(Font(Res.font.BadComic_Regular))
+    val defaultTypography = MaterialTheme.typography
+    val typography = Typography(
+        displayLarge = defaultTypography.displayLarge.copy(fontFamily = fontFamily),
+        displayMedium = defaultTypography.displayMedium.copy(fontFamily = fontFamily),
+        displaySmall = defaultTypography.displaySmall.copy(fontFamily = fontFamily),
+
+        headlineLarge = defaultTypography.headlineLarge.copy(fontFamily = fontFamily),
+        headlineMedium = defaultTypography.headlineMedium.copy(fontFamily = fontFamily),
+        headlineSmall = defaultTypography.headlineSmall.copy(fontFamily = fontFamily),
+
+        titleLarge = defaultTypography.titleLarge.copy(fontFamily = fontFamily),
+        titleMedium = defaultTypography.titleMedium.copy(fontFamily = fontFamily),
+        titleSmall = defaultTypography.titleSmall.copy(fontFamily = fontFamily),
+
+        bodyLarge = defaultTypography.bodyLarge.copy(fontFamily = fontFamily),
+        bodyMedium = defaultTypography.bodyMedium.copy(fontFamily = fontFamily, fontSize = sizes.font),
+        bodySmall = defaultTypography.bodySmall.copy(fontFamily = fontFamily),
+
+        labelLarge = defaultTypography.labelLarge.copy(fontFamily = fontFamily),
+        labelMedium = defaultTypography.labelMedium.copy(fontFamily = fontFamily),
+        labelSmall = defaultTypography.labelSmall.copy(fontFamily = fontFamily)
+    )
+
     MaterialTheme(
-        colors = Colors.yukiColors,
-        typography = Typography(FontFamily(Font(Res.font.BadComic_Regular)), body1 = TextStyle(fontSize = 12.sp)),
+        colorScheme = Colors.YukiColorScheme(),
+        typography = typography,
         content = content
     )
 }
@@ -100,19 +123,20 @@ object Colors {
         dividers = currentYukiTheme.surfaceSecondary
     }
 
-    val yukiColors = androidx.compose.material.Colors(
+    @Composable
+    @ReadOnlyComposable
+    fun YukiColorScheme() = MaterialTheme.colorScheme.copy(
         primary = bars,
-        primaryVariant = Color(0xFF3700B3),
+        primaryContainer = Color(0xFF3700B3),
         secondary = Color(0xFF03DAC6),
-        secondaryVariant = Color(0xFF018786),
-        background = Color.White,
+        secondaryContainer = Color(0xFF018786),
+        background = currentYukiTheme.surface,
         surface = Color.White,
         error = lightRed,
         onPrimary = Color.White,
         onSecondary = violetDark,
         onBackground = violetDark,
-        onSurface = violetDark,
+        onSurface = Color.White,
         onError = Color.White,
-        true
     )
 }

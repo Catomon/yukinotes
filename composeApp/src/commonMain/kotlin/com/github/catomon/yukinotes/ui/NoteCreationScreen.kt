@@ -6,14 +6,17 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -22,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.github.catomon.yukinotes.data.mappers.toNote
@@ -34,8 +38,9 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import kotlin.uuid.Uuid
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NoteCreationScreen(yukiViewModel: YukiViewModel, noteId: String? = null, navBack: () -> Unit) {
+fun NoteEditScreen(yukiViewModel: YukiViewModel, noteId: String? = null, navBack: () -> Unit) {
     var newNote by remember { mutableStateOf<Note?>(null) }
 
     LaunchedEffect(null) {
@@ -73,7 +78,7 @@ fun NoteCreationScreen(yukiViewModel: YukiViewModel, noteId: String? = null, nav
             label = { Text("Title") },
             modifier = Modifier.fillMaxWidth().padding(4.dp, 4.dp, 4.dp, 0.dp),
             maxLines = 1,
-            colors = TextFieldDefaults.textFieldColors(textColor = Color.White, cursorColor = Color.White),
+            colors = TextFieldDefaults.textFieldColors(unfocusedTextColor = Color.White, focusedTextColor = Color.White, cursorColor = Color.White),
             isError = titleError,
         )
 
@@ -84,7 +89,7 @@ fun NoteCreationScreen(yukiViewModel: YukiViewModel, noteId: String? = null, nav
             },
             label = { Text("Details") },
             modifier = Modifier.fillMaxWidth().weight(0.5f).padding(4.dp),
-            colors = TextFieldDefaults.textFieldColors(textColor = Color.White, cursorColor = Color.White)
+            colors = TextFieldDefaults.textFieldColors(unfocusedTextColor = Color.White, focusedTextColor = Color.White, cursorColor = Color.White)
         )
 
         BottomBar(
@@ -122,13 +127,13 @@ fun BottomBar(onCancel: () -> Unit, onConfirm: () -> Unit, modifier: Modifier = 
         Image(
             painterResource(Res.drawable.cancel),
             "Cancel Create Note",
-            Modifier.height(32.dp).width(64.dp).clickable(onClick = onCancel).weight(0.2f)
+            Modifier.fillMaxHeight().width(64.dp).clip(RoundedCornerShape(8.dp)).clickable(onClick = onCancel).weight(0.2f)
         )
 
         Image(
             painterResource(Res.drawable.confirm),
             "Confirm Create Note",
-            Modifier.height(32.dp).width(64.dp).clickable(onClick = onConfirm).weight(0.2f)
+            Modifier.fillMaxHeight().width(64.dp).clip(RoundedCornerShape(8.dp)).clickable(onClick = onConfirm).weight(0.2f)
         )
     }
 }

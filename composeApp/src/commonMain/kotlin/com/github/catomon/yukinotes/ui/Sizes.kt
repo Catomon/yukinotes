@@ -18,4 +18,6 @@ interface Sizes {
 
     val topBarSize: Dp
     val bottomBarSize: Dp
+
+    val noteItemWidth: Dp
 }

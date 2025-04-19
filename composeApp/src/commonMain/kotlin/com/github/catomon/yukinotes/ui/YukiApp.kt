@@ -25,7 +25,7 @@ import org.koin.java.KoinJavaComponent.get
 @Composable
 @Preview
 fun YukiApp(modifier: Modifier = Modifier) {
-    val yukiViewModel: YukiViewModel = get(YukiViewModel::class.java)
+    val yukiViewModel: YukiViewModel = remember { get(YukiViewModel::class.java) }
     val navController: NavHostController = rememberNavController()
     val settings by yukiViewModel.userSettings
     var topBarColor by remember { mutableStateOf(Colors.bars) }
@@ -35,61 +35,59 @@ fun YukiApp(modifier: Modifier = Modifier) {
         topBarColor = Colors.bars
     }
 
-    YukiTheme {
-        Column(modifier) {
-            TopBar(
-                menuButtonClicked = {
-                    val currentRoute = navController.currentBackStackEntry?.destination?.route
-                    if (currentRoute == Routes.SETTINGS) {
-                        navController.popBackStack()
-                    } else {
-                        navController.navigate(Routes.SETTINGS)
-                    }
-                },
-                Modifier.background(topBarColor)
-            )
-
-            NavHost(
-                navController,
-                startDestination = Routes.NOTES,
-                modifier = Modifier.fillMaxSize().background(color = Colors.background),
-                enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left) },
-                exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right) },
-            ) {
-                composable(Routes.NOTES) {
-                    NotesScreen(yukiViewModel, navController)
+    Column(modifier) {
+        TopBar(
+            menuButtonClicked = {
+                val currentRoute = navController.currentBackStackEntry?.destination?.route
+                if (currentRoute == Routes.SETTINGS) {
+                    navController.popBackStack()
+                } else {
+                    navController.navigate(Routes.SETTINGS)
                 }
+            },
+            Modifier.background(topBarColor)
+        )
 
-                composable(Routes.EDIT_NOTE) { backStackEntry ->
-                    val noteId = backStackEntry.arguments?.getString(RouteArgs.NOTE_ID)
-                        ?: throw IllegalStateException("${RouteArgs.NOTE_ID} argument is missing")
+        NavHost(
+            navController,
+            startDestination = Routes.NOTES,
+            modifier = Modifier.fillMaxSize().background(color = Colors.background),
+            enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left) },
+            exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right) },
+        ) {
+            composable(Routes.NOTES) {
+                NotesScreen(yukiViewModel, navController)
+            }
 
-                    val customSelectionColors = TextSelectionColors(
-                        handleColor = Color.Gray,
-                        backgroundColor = Color.Black
+            composable(Routes.EDIT_NOTE) { backStackEntry ->
+                val noteId = backStackEntry.arguments?.getString(RouteArgs.NOTE_ID)
+                    ?: throw IllegalStateException("${RouteArgs.NOTE_ID} argument is missing")
+
+                val customSelectionColors = TextSelectionColors(
+                    handleColor = Color.Gray,
+                    backgroundColor = Color.Black
+                )
+
+                CompositionLocalProvider(LocalTextSelectionColors provides customSelectionColors) {
+                    NoteEditScreen(
+                        yukiViewModel,
+                        if (noteId == "null") null else noteId,
+                        navBack = {
+                            navController.popBackStack(
+                                Routes.NOTES,
+                                inclusive = false
+                            )
+                        })
+                }
+            }
+
+            composable(Routes.SETTINGS) {
+                SettingsScreen(yukiViewModel, navBack = {
+                    navController.popBackStack(
+                        Routes.NOTES,
+                        inclusive = false
                     )
-
-                    CompositionLocalProvider(LocalTextSelectionColors provides customSelectionColors) {
-                        NoteCreationScreen(
-                            yukiViewModel,
-                            if (noteId == "null") null else noteId,
-                            navBack = {
-                                navController.popBackStack(
-                                    Routes.NOTES,
-                                    inclusive = false
-                                )
-                            })
-                    }
-                }
-
-                composable(Routes.SETTINGS) {
-                    SettingsScreen(yukiViewModel, navBack = {
-                        navController.popBackStack(
-                            Routes.NOTES,
-                            inclusive = false
-                        )
-                    })
-                }
+                })
             }
         }
     }

@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,7 +38,7 @@ fun TopBar(menuButtonClicked: () -> Unit, modifier: Modifier = Modifier) {
     ) {
         Image(painterResource(YukiIcons.appIcon), "App Icon", Modifier.size(sizes.topBarSize))
 
-        Text(Const.APP_NAME, color = Color.White, modifier = Modifier.padding(start = 8.dp), fontSize = 12.sp)
+        Text(Const.APP_NAME, color = Color.White, modifier = Modifier.padding(start = 8.dp), fontSize = sizes.fontHeadline)
 
         Spacer(Modifier.weight(2f))
 

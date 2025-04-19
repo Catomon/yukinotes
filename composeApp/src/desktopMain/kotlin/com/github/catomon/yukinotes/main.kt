@@ -15,6 +15,7 @@ import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
 import com.github.catomon.yukinotes.di.appModule
 import com.github.catomon.yukinotes.ui.YukiApp
+import com.github.catomon.yukinotes.ui.YukiTheme
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.core.context.GlobalContext.startKoin
@@ -57,9 +58,11 @@ val LocalWindow = compositionLocalOf<ComposeWindow> {
 @Preview
 fun WindowScope.App() {
     WindowDraggableArea {
-        if (isOpenGl)
-            YukiApp(Modifier.clip(RoundedCornerShape(12.dp)))
-        else
-            YukiApp()
+        YukiTheme {
+            if (isOpenGl)
+                YukiApp(Modifier.clip(RoundedCornerShape(12.dp)))
+            else
+                YukiApp()
+        }
     }
 }
