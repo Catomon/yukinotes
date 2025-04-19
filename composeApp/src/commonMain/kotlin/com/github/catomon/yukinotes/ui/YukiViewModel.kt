@@ -1,4 +1,4 @@
-package com.github.catomon.yukinotes.feature
+package com.github.catomon.yukinotes.ui
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel

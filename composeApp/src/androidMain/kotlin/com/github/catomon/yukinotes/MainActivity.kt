@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.github.catomon.yukinotes.di.appModule
-import com.github.catomon.yukinotes.feature.YukiApp
+import com.github.catomon.yukinotes.ui.YukiApp
 import org.koin.core.context.GlobalContext.startKoin
 
 class MainActivity : ComponentActivity() {

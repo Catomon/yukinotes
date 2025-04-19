@@ -1,4 +1,4 @@
-package com.github.catomon.yukinotes.feature
+package com.github.catomon.yukinotes.ui
 
 object RouteArgs {
     const val NULL = "null"

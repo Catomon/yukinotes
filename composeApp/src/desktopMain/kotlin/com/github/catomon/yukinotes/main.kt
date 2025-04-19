@@ -14,7 +14,7 @@ import androidx.compose.ui.window.WindowScope
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
 import com.github.catomon.yukinotes.di.appModule
-import com.github.catomon.yukinotes.feature.YukiApp
+import com.github.catomon.yukinotes.ui.YukiApp
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.core.context.GlobalContext.startKoin

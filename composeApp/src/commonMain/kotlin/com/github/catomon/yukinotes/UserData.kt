@@ -2,7 +2,7 @@ package com.github.catomon.yukinotes
 
 import com.github.catomon.yukinotes.data.database.YukiDatabase
 import com.github.catomon.yukinotes.data.model.NoteEntity
-import com.github.catomon.yukinotes.feature.Themes
+import com.github.catomon.yukinotes.ui.Themes
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

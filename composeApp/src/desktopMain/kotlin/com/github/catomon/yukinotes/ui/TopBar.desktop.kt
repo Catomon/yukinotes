@@ -1,4 +1,4 @@
-package com.github.catomon.yukinotes.feature
+package com.github.catomon.yukinotes.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable

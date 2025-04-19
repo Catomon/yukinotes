@@ -1,4 +1,4 @@
-package com.github.catomon.yukinotes.feature
+package com.github.catomon.yukinotes.ui
 
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
