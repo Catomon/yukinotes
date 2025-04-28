@@ -12,8 +12,8 @@ actual val sizes: Sizes = object : Sizes {
     override val notesListPadding: Dp = 2.dp
     override val noteItemPadding: Dp = 1.dp
     override val dividerThickness: Dp = 2.dp
-    override val topBarSize: Dp = 24.dp
-    override val bottomBarSize: Dp = 24.dp
+    override val topBarSize: Dp = 32.dp
+    override val bottomBarSize: Dp = 32.dp
     override val noteDatePadding: Dp = 6.dp
     override val noteItemWidth: Dp = 125.dp
 }

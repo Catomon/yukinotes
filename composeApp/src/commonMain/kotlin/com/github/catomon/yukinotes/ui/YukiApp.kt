@@ -37,7 +37,7 @@ fun YukiApp(modifier: Modifier = Modifier) {
 
     Column(modifier) {
         TopBar(
-            menuButtonClicked = {
+            openSettings = {
                 val currentRoute = navController.currentBackStackEntry?.destination?.route
                 if (currentRoute == Routes.SETTINGS) {
                     navController.popBackStack()
@@ -51,7 +51,7 @@ fun YukiApp(modifier: Modifier = Modifier) {
         NavHost(
             navController,
             startDestination = Routes.NOTES,
-            modifier = Modifier.fillMaxSize().background(color = Colors.background),
+            modifier = Modifier.fillMaxSize().background(color = Colors.bars),
             enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left) },
             exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right) },
         ) {

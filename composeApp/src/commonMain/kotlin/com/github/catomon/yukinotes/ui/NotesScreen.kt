@@ -1,8 +1,6 @@
 package com.github.catomon.yukinotes.ui
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -11,7 +9,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -37,7 +34,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -51,7 +47,6 @@ import com.github.catomon.yukinotes.data.model.NoteEntity
 import com.github.catomon.yukinotes.epochMillisToSimpleDate
 import com.github.catomon.yukinotes.loadSettings
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.painterResource
 import kotlin.uuid.Uuid
 
 data class NotesScreenState(
@@ -71,11 +66,12 @@ fun NotesScreen(viewModel: YukiViewModel, navController: NavHostController) {
         showConfirmDeleteNote = false
     }
 
-    Box(Modifier.background(color = Colors.background).fillMaxSize().clickable(
-        interactionSource = remember { MutableInteractionSource() }, indication = null
-    ) {
-        viewModel.selectNote(null)
-    }) {
+    Box(
+        Modifier.background(color = Colors.bars).fillMaxSize().clickable(
+            interactionSource = remember { MutableInteractionSource() }, indication = null
+        ) {
+            viewModel.selectNote(null)
+        }) {
         if (true)
             NotesStaggeredGrid(
                 state,
@@ -149,7 +145,7 @@ fun NotesStaggeredGrid(
             start = 0.dp,
             top = 0.dp,
             end = 0.dp,
-            bottom = 32.dp
+            bottom = 86.dp
         ),
         modifier = modifier
     ) {
@@ -212,7 +208,8 @@ fun NoteItem(
 
     Box(contentAlignment = Alignment.Center) {
         Column(
-            Modifier.fillMaxWidth().clickable(indication = null,
+            Modifier.fillMaxWidth().clickable(
+                indication = null,
                 interactionSource = remember { MutableInteractionSource() },
                 onClick = {
                     onNoteSelected(note.id)
@@ -226,7 +223,7 @@ fun NoteItem(
         ) {
             Text(
                 note.title,
-                modifier = Modifier.fillMaxSize().padding(vertical = 4.dp),
+                modifier = Modifier.fillMaxSize().padding(vertical = 6.dp),
                 maxLines = 3,
                 fontSize = sizes.fontHeadline,
                 color = Colors.noteTextHeadline
@@ -239,22 +236,25 @@ fun NoteItem(
                     color = Colors.dividers
                 )
 
-                Text(note.content, modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp).let {
-                    if (isSelected) {
-                        it
-                    } else {
-                        it.requiredHeightIn(0.dp, 150.dp)
-                    }
-                }, color = Colors.noteText,
+                Text(
+                    note.content, modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp).let {
+                        if (isSelected) {
+                            it
+                        } else {
+                            it.requiredHeightIn(0.dp, 150.dp)
+                        }
+                    }, color = Colors.noteText,
 //                    maxLines = 6,
                     fontSize = sizes.font, overflow = TextOverflow.Ellipsis, onTextLayout = {
                         isContentOverflow = it.hasVisualOverflow
                     },
-                    lineHeight = (sizes.font.value + 2.sp.value).sp)
+                    lineHeight = sizes.fontLineHeight
+                )
             }
 
             if (isSelected) {
-                Box(contentAlignment = Alignment.Center,
+                Box(
+                    contentAlignment = Alignment.Center,
                     modifier = Modifier.padding(end = 8.dp, bottom = 8.dp).align(Alignment.End)
                         .drawBehind {
                             drawRoundRect(
@@ -277,7 +277,8 @@ fun NoteItem(
         }
 
         if (!isSelected && ((showDetails && isContentOverflow) || (!state.alwaysShowDetails && note.content.isNotBlank()))) {
-            Box(contentAlignment = Alignment.Center,
+            Box(
+                contentAlignment = Alignment.Center,
                 modifier = Modifier.padding(end = 8.dp, bottom = 8.dp).align(Alignment.BottomEnd)
                     .drawBehind {
                         drawRoundRect(
@@ -296,144 +297,4 @@ fun NoteItem(
             }
         }
     }
-}
-
-@Composable
-fun BottomBar(
-    noteSelected: Boolean,
-    isShowConfirmDelete: Boolean,
-    showRemoveConfirm: () -> Unit,
-    removeNote: () -> Unit,
-    cancelRemove: () -> Unit,
-    createNote: () -> Unit,
-    editNote: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-
-    val buttonSize = sizes.bottomBarSize
-    AnimatedContent(noteSelected, modifier = modifier.background(Colors.bars)) {
-        if (it) {
-            AnimatedContent(isShowConfirmDelete && noteSelected) { showConfirm ->
-                if (showConfirm) {
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = modifier.fillMaxSize()
-                    ) {
-                        CancelDeleteButton(
-                            cancelRemove,
-                            Modifier.height(buttonSize).weight(0.33f)
-                        )
-                        TrashcanImage(Modifier.height(buttonSize).weight(0.33f))
-                        ConfirmDeleteButton(
-                            removeNote,
-                            Modifier.height(buttonSize).weight(0.33f)
-                        )
-                    }
-                } else {
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = modifier.fillMaxSize()
-                    ) {
-                        DeleteButton(
-                            showRemoveConfirm,
-                            Modifier.height(buttonSize).weight(0.33f)
-                        )
-                        CreateButton(createNote, Modifier.height(buttonSize).weight(0.33f))
-                        EditButton(editNote, Modifier.height(buttonSize).weight(0.33f))
-                    }
-                }
-            }
-        } else {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = modifier.fillMaxSize()
-            ) {
-                CreateButton(createNote, Modifier.height(buttonSize).weight(0.33f))
-            }
-        }
-    }
-}
-
-@Composable
-private fun EditButton(
-    editNote: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Image(
-        painterResource(YukiIcons.editNote),
-        contentDescription = "Edit Note",
-        modifier = modifier
-            .clip(RoundedCornerShape(10.dp))
-            .clickable(onClick = editNote)
-    )
-}
-
-@Composable
-private fun CreateButton(
-    createNote: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Image(
-        painterResource(YukiIcons.createNote),
-        contentDescription = "Create Note",
-        modifier = modifier
-            .clip(RoundedCornerShape(10.dp))
-            .clickable(onClick = createNote)
-    )
-}
-
-@Composable
-private fun DeleteButton(
-    showRemoveConfirm: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Image(
-        painterResource(YukiIcons.deleteNote),
-        contentDescription = "Delete Note",
-        modifier = modifier
-            .clip(RoundedCornerShape(10.dp))
-            .clickable(onClick = showRemoveConfirm)
-    )
-}
-
-@Composable
-private fun ConfirmDeleteButton(
-    removeNote: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Image(
-        painterResource(YukiIcons.confirm),
-        contentDescription = "Confirm Delete Note",
-        modifier = modifier
-            .clip(RoundedCornerShape(10.dp))
-            .clickable(onClick = removeNote)
-    )
-}
-
-@Composable
-private fun TrashcanImage(
-    modifier: Modifier = Modifier
-) {
-    Image(
-        painterResource(YukiIcons.confirmDeleteNote),
-        contentDescription = "Trashcan",
-        modifier = modifier.clip(RoundedCornerShape(10.dp))
-    )
-}
-
-@Composable
-private fun CancelDeleteButton(
-    cancelRemove: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Image(
-        painterResource(YukiIcons.cancel),
-        contentDescription = "Cancel Delete Note",
-        modifier = modifier
-            .clip(RoundedCornerShape(10.dp))
-            .clickable(onClick = cancelRemove)
-    )
 }

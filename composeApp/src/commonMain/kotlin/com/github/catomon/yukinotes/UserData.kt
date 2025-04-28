@@ -3,6 +3,9 @@ package com.github.catomon.yukinotes
 import com.github.catomon.yukinotes.data.database.YukiDatabase
 import com.github.catomon.yukinotes.data.model.NoteEntity
 import com.github.catomon.yukinotes.ui.Themes
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -17,7 +20,7 @@ expect val userDataFolder: File
 
 val storeNotesAsTxtFiles by lazy { loadSettings().storeAsTxtFiles }
 
-suspend fun exportNotesAsTxt(notes: List<NoteEntity>) {
+suspend fun exportNotesAsTxt(notes: List<NoteEntity>, ioDispatcher: CoroutineDispatcher = Dispatchers.IO) = withContext(ioDispatcher) {
     val notesFolder = File("$userFolderPath/notes/")
     try {
         notesFolder.mkdirs()

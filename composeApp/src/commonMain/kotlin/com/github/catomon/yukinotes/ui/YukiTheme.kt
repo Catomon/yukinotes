@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.sp
 import com.github.catomon.yukinotes.loadSettings
 import org.jetbrains.compose.resources.Font
 import yukinotes.composeapp.generated.resources.BadComic_Regular
@@ -26,6 +27,7 @@ object Themes {
         override val font = Color(0xFFFFFFFF)
         override val fontSecondary = Color(0xffffeef2)
         override val bars = Color(0xffee588c)
+        override val barsShadow = Color(0xffaf3660)
     }
 
     class Violet : IYukiTheme {
@@ -36,6 +38,7 @@ object Themes {
         override val font = Color(0xFFFFFFFF)
         override val fontSecondary = Color(0xFFDECCFF)
         override val bars = Color(0xFF66419F)
+        override val barsShadow = Color(0xff48257e)
     }
 
     class Blue : IYukiTheme {
@@ -46,6 +49,7 @@ object Themes {
         override val font = Color(0xFFFFFFFF)
         override val fontSecondary = Color(0xffd2e6ff)
         override val bars = Color(0xff0f2e93)
+        override val barsShadow = Color(0xff0c2473)
     }
 
     interface IYukiTheme {
@@ -56,6 +60,7 @@ object Themes {
         val font: Color
         val fontSecondary: Color
         val bars: Color
+        val barsShadow: Color
     }
 }
 
@@ -76,9 +81,9 @@ fun YukiTheme(content: @Composable () -> Unit) {
         titleMedium = defaultTypography.titleMedium.copy(fontFamily = fontFamily),
         titleSmall = defaultTypography.titleSmall.copy(fontFamily = fontFamily),
 
-        bodyLarge = defaultTypography.bodyLarge.copy(fontFamily = fontFamily),
-        bodyMedium = defaultTypography.bodyMedium.copy(fontFamily = fontFamily, fontSize = sizes.font),
-        bodySmall = defaultTypography.bodySmall.copy(fontFamily = fontFamily),
+        bodyLarge = defaultTypography.bodyLarge.copy(fontFamily = fontFamily, fontSize = sizes.font, lineHeight = sizes.fontLineHeight),
+        bodyMedium = defaultTypography.bodyMedium.copy(fontFamily = fontFamily, fontSize = sizes.font, lineHeight = sizes.fontLineHeight),
+        bodySmall = defaultTypography.bodySmall.copy(fontFamily = fontFamily, fontSize = sizes.font, lineHeight = sizes.fontLineHeight),
 
         labelLarge = defaultTypography.labelLarge.copy(fontFamily = fontFamily),
         labelMedium = defaultTypography.labelMedium.copy(fontFamily = fontFamily),
@@ -131,12 +136,12 @@ object Colors {
         secondary = Color(0xFF03DAC6),
         secondaryContainer = Color(0xFF018786),
         background = currentYukiTheme.surface,
-        surface = Color.White,
+        surface = bars,
         error = lightRed,
-        onPrimary = Color.White,
+        onPrimary = background,
         onSecondary = violetDark,
         onBackground = violetDark,
-        onSurface = Color.White,
+        onSurface = background,
         onError = Color.White,
     )
 }

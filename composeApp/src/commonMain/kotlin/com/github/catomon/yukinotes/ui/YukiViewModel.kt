@@ -32,10 +32,9 @@ class YukiViewModel(
     val userSettings = mutableStateOf(loadSettings())
 
     init {
-        //test
-//        viewModelScope.launch {
-//            notes.collect { notes ->
-//                _notesScreenState.update {
+        viewModelScope.launch {
+            notes.collect { notes ->
+                _notesScreenState.update {
 //                        it.copy(notes = Array<NoteEntity>(30) {
 //                            NoteEntity(
 //                                id = Uuid.random(),
@@ -46,9 +45,11 @@ class YukiViewModel(
 //                                isPinned = false
 //                            )
 //                        }.toList())
-//                }
-//            }
-//        }
+
+                    it.copy(notes = notes)
+                }
+            }
+        }
     }
 
     fun updateUserSettings(newSettings: UserSettings) {
@@ -58,9 +59,11 @@ class YukiViewModel(
 
     fun setStoreAsTxt(storeAsTxt: Boolean) {
         updateUserSettings(userSettings.value.copy(storeAsTxtFiles = storeAsTxt))
-        viewModelScope.launch {
-            exportNotesAsTxt(_notesScreenState.value.notes)
-        }
+
+        if (storeAsTxt)
+            viewModelScope.launch {
+                exportNotesAsTxt(_notesScreenState.value.notes)
+            }
     }
 
     fun alwaysShowDetails(alwaysShowDetails: Boolean = true) {
