@@ -45,6 +45,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.github.catomon.yukinotes.data.model.NoteEntity
 import com.github.catomon.yukinotes.epochMillisToSimpleDate
@@ -225,7 +226,7 @@ fun NoteItem(
         ) {
             Text(
                 note.title,
-                modifier = Modifier.fillMaxSize().padding(vertical = 6.dp),
+                modifier = Modifier.fillMaxSize().padding(vertical = 4.dp),
                 maxLines = 3,
                 fontSize = sizes.fontHeadline,
                 color = Colors.noteTextHeadline
@@ -234,7 +235,7 @@ fun NoteItem(
             if (showDetails) {
                 Divider(
                     thickness = sizes.dividerThickness,
-                    modifier = Modifier.fillMaxWidth().padding(end = 8.dp),
+                    modifier = Modifier.fillMaxWidth().padding(end = 8.dp, bottom = 6.dp),
                     color = Colors.dividers
                 )
 
@@ -248,7 +249,8 @@ fun NoteItem(
 //                    maxLines = 6,
                     fontSize = sizes.font, overflow = TextOverflow.Ellipsis, onTextLayout = {
                         isContentOverflow = it.hasVisualOverflow
-                    })
+                    },
+                    lineHeight = (sizes.font.value + 2.sp.value).sp)
             }
 
             if (isSelected) {

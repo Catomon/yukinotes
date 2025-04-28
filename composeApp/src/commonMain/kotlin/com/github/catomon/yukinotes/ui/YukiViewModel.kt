@@ -31,31 +31,24 @@ class YukiViewModel(
 
     val userSettings = mutableStateOf(loadSettings())
 
-    val testNotes = Array<NoteEntity>(30) {
-        NoteEntity(
-            id = Uuid.random(),
-            title = "asdasdasdddddddddddddddddddddddddd",
-            content = "dassssssssssssssssssssssssssssssssssssasd",
-            createdAt = 1,
-            updatedAt = 2,
-            isPinned = false
-        )
-    }.toList()
-
-    var test = true
-
     init {
-        println("ViewModelCreated")
-        viewModelScope.launch {
-            notes.collect { notes ->
-                _notesScreenState.update {
-                    if (test)
-                        it.copy(notes = testNotes)
-                    else
-                        it.copy(notes = notes)
-                }
-            }
-        }
+        //test
+//        viewModelScope.launch {
+//            notes.collect { notes ->
+//                _notesScreenState.update {
+//                        it.copy(notes = Array<NoteEntity>(30) {
+//                            NoteEntity(
+//                                id = Uuid.random(),
+//                                title = "asdasdasdddddddddddddddddddddddddd",
+//                                content = "dassssssssssssssssssssssssssssssssssssasd",
+//                                createdAt = 1,
+//                                updatedAt = 2,
+//                                isPinned = false
+//                            )
+//                        }.toList())
+//                }
+//            }
+//        }
     }
 
     fun updateUserSettings(newSettings: UserSettings) {
