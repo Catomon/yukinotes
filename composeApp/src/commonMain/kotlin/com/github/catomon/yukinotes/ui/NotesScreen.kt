@@ -57,7 +57,7 @@ data class NotesScreenState(
 )
 
 @Composable
-fun NotesScreen(viewModel: YukiViewModel, navController: NavHostController) {
+fun NotesScreen(viewModel: YukiViewModel, navController: NavHostController, modifier: Modifier = Modifier) {
     val state by viewModel.notesScreenState.collectAsState()
 
     var showConfirmDeleteNote by remember { mutableStateOf(false) }
@@ -67,12 +67,12 @@ fun NotesScreen(viewModel: YukiViewModel, navController: NavHostController) {
     }
 
     Box(
-        Modifier.background(color = Colors.bars).fillMaxSize().clickable(
+        modifier.background(color = Colors.bars).fillMaxSize().clickable(
             interactionSource = remember { MutableInteractionSource() }, indication = null
         ) {
             viewModel.selectNote(null)
         }) {
-        if (true)
+        if (true) {
             NotesStaggeredGrid(
                 state,
                 onNoteSelected = { noteId ->
@@ -81,7 +81,7 @@ fun NotesScreen(viewModel: YukiViewModel, navController: NavHostController) {
                 modifier = Modifier.align(Alignment.TopStart)
                     .padding(horizontal = sizes.notesListPadding)
             )
-        else
+        } else {
             NotesList(
                 state,
                 onNoteSelected = { noteId ->
@@ -90,6 +90,7 @@ fun NotesScreen(viewModel: YukiViewModel, navController: NavHostController) {
                 modifier = Modifier.align(Alignment.TopStart)
                     .padding(horizontal = sizes.notesListPadding)
             )
+        }
 
         BottomBar(
             noteSelected = state.selectedNoteId != null,

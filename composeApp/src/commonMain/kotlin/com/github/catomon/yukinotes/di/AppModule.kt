@@ -9,6 +9,11 @@ import com.github.catomon.yukinotes.storeNotesAsTxtFiles
 import org.koin.dsl.module
 
 val appModule = module {
-    single<YukiRepository> { if (storeNotesAsTxtFiles) YukiTxtRepositoryImpl() else YukiRepositoryImpl(createDatabase().noteDao()) }
-    factory { YukiViewModel(get()) }
+    single<YukiRepository> {
+        if (storeNotesAsTxtFiles) YukiTxtRepositoryImpl() else YukiRepositoryImpl(
+            createDatabase().noteDao()
+        )
+    }
+
+    single { YukiViewModel(get()) }
 }

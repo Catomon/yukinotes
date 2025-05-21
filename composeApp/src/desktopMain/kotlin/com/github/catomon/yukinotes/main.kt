@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
@@ -21,6 +20,7 @@ import androidx.compose.ui.window.application
 import com.github.catomon.yukinotes.di.appModule
 import com.github.catomon.yukinotes.ui.Colors
 import com.github.catomon.yukinotes.ui.YukiApp
+import com.github.catomon.yukinotes.ui.YukiAppDesktopScreen
 import com.github.catomon.yukinotes.ui.YukiTheme
 import com.github.catomon.yukinotes.ui.customShadow
 import org.jetbrains.compose.resources.painterResource
@@ -67,7 +67,7 @@ fun WindowScope.App() {
     WindowDraggableArea {
         YukiTheme {
             if (isTransparent)
-                YukiApp(Modifier.padding(8.dp)
+                YukiAppDesktopScreen(Modifier.padding(8.dp)
                     .customShadow()
                     .drawBehind {
                         drawRoundRect(
