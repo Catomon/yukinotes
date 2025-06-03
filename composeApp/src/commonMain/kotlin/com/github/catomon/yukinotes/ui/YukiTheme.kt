@@ -21,34 +21,34 @@ object Themes {
 
     class Pink : IYukiTheme {
         override val name: String = "yuki"
-        override val background = Color(0xffee6b98)
-        override val surface = Color(0xfffd8ead)
-        override val surfaceSecondary = Color(0xfff87fa1)
+        override val background = Color(0xffe9678f)
+        override val surface = Color(0xcdffc5d6)
+        override val surfaceSecondary = Color(0xcdffabc1)
         override val font = Color(0xFFFFFFFF)
-        override val fontSecondary = Color(0xffffeef2)
-        override val bars = Color(0xffee588c)
-        override val barsShadow = Color(0xffaf3660)
+        override val fontSecondary = Color(0xFFFFE1EA)
+        override val bars = Color(0xffe9678f).copy(0.9f)
+        override val barsShadow = Color(0xffc44a7c)
     }
 
     class Violet : IYukiTheme {
         override val name: String = "gami-kasa"
         override val background = Color(0xff6e4eaa)
-        override val surface = Color(0xff916dd6)
-        override val surfaceSecondary = Color(0xff8563cc)
+        override val surface = Color(0xffc8abff).copy(0.8f)
+        override val surfaceSecondary = Color(0xffc0a1ff).copy(0.8f)
         override val font = Color(0xFFFFFFFF)
         override val fontSecondary = Color(0xFFDECCFF)
-        override val bars = Color(0xFF66419F)
+        override val bars = Color(0xff6232a9).copy(0.9f)
         override val barsShadow = Color(0xff48257e)
     }
 
     class Blue : IYukiTheme {
         override val name: String = "nata"
         override val background = Color(0xff3a55af)
-        override val surface = Color(0xff6197de)
-        override val surfaceSecondary = Color(0xff3671c1)
+        override val surface = Color(0xff6197de).copy(0.8f)
+        override val surfaceSecondary = Color(0xff3671c1).copy(0.8f)
         override val font = Color(0xFFFFFFFF)
         override val fontSecondary = Color(0xffd2e6ff)
-        override val bars = Color(0xff0f2e93)
+        override val bars = Color(0xff0f2e93).copy(0.9f)
         override val barsShadow = Color(0xff0c2473)
     }
 

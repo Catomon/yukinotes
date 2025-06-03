@@ -42,10 +42,10 @@ fun main() = application {
         e.printStackTrace()
     }
 
-    val windowState = WindowState(width = 330.dp, height = 500.dp) //400 / 710
+    val windowState = WindowState(width = 600.dp, height = 500.dp) //400 / 710
     Window(
         onCloseRequest = ::exitApplication,
-        title = "U-ki Notes",
+        title = "yukinotes",
         undecorated = true,
         transparent = isTransparent,
         state = windowState,
@@ -71,17 +71,15 @@ fun WindowScope.App() {
                     .customShadow()
                     .drawBehind {
                         drawRoundRect(
-                            color = Colors.currentYukiTheme.background,
-                            topLeft = Offset(0f, -2f),
-                            size = this.size.copy(),
-                            cornerRadius = CornerRadius(12f)
-                        )
-                    }
-                    .drawBehind {
-                        drawRoundRect(
                             color = Colors.currentYukiTheme.barsShadow,
                             topLeft = Offset(0f, 2f),
-                            size = this.size.copy(),
+                            size = this.size,
+                            cornerRadius = CornerRadius(12f)
+                        )
+                        drawRoundRect(
+                            color = Colors.currentYukiTheme.bars,
+                            topLeft = Offset(0f, -2f),
+                            size = this.size,
                             cornerRadius = CornerRadius(12f)
                         )
                     }

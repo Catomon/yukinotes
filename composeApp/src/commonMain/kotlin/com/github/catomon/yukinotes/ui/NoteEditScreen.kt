@@ -147,6 +147,132 @@ fun NoteEditScreen(yukiViewModel: YukiViewModel, noteId: String? = null, navBack
 }
 
 @Composable
+fun NoteEditPane(yukiViewModel: YukiViewModel, noteId: String? = null) {
+    var editedNote by remember { mutableStateOf<Note?>(null) }
+
+    LaunchedEffect(null) {
+        if (noteId != null) {
+            yukiViewModel.getNoteById(Uuid.parse(noteId))?.toNote()?.let {
+                editedNote = it
+            }
+        }
+    }
+
+    var title by remember { mutableStateOf("") }
+    var content by remember { mutableStateOf("") }
+
+    var titleError by remember { mutableStateOf(false) }
+
+    LaunchedEffect(editedNote) {
+        title = editedNote?.title ?: ""
+        content = editedNote?.content ?: ""
+    }
+
+    Column(
+        Modifier.fillMaxSize(),//.padding(start = 48.dp, end = 48.dp, top = 16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        TextField(
+            value = title,
+            onValueChange = {
+                if (it.length <= 255)
+                    title = it
+
+                if (titleError)
+                    titleError = false
+            },
+            label = { Text("Title:") },
+            modifier = Modifier.fillMaxWidth().padding(
+                start = 4.dp,
+                top = 4.dp,
+                end = 4.dp,
+                bottom = 0.dp
+            ),
+            maxLines = 1,
+            colors = TextFieldDefaults.colors(
+                unfocusedTextColor = Color.White,
+                focusedTextColor = Color.White,
+                cursorColor = Color.White,
+                unfocusedContainerColor = Color.Transparent,
+                focusedContainerColor = Color.Transparent,
+                errorContainerColor = Colors.bars,
+                unfocusedLabelColor = Colors.currentYukiTheme.surface,
+                focusedLabelColor = Colors.currentYukiTheme.surface,
+                unfocusedIndicatorColor = Color.Transparent,
+            ),
+            isError = titleError,
+        )
+
+        TextField(
+            content,
+            {
+                content = it
+            },
+            label = { Text("Details:") },
+            modifier = Modifier.fillMaxWidth().weight(0.99f).padding(vertical = 4.dp),
+            colors = TextFieldDefaults.colors(
+                unfocusedTextColor = Color.White,
+                focusedTextColor = Color.White,
+                cursorColor = Color.White,
+                unfocusedContainerColor = Color.Transparent,
+                focusedContainerColor = Color.Transparent,
+                errorContainerColor = Colors.bars,
+                unfocusedLabelColor = Colors.currentYukiTheme.surface,
+                focusedLabelColor = Colors.currentYukiTheme.surface,
+                unfocusedIndicatorColor = Color.Transparent,
+            )
+        )
+
+        editedNote?.updatedAt?.let { millis ->
+            if (millis > 0)
+                Text("Edited: ${epochMillisToSimpleDate(millis)}", color = Colors.currentYukiTheme.surface)
+        }
+
+
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.height(sizes.bottomBarSize)
+        ) {
+            Icon(
+                painterResource(Res.drawable.cancel),
+                null,
+                Modifier.fillMaxHeight().width(64.dp).clip(RoundedCornerShape(8.dp))
+                    .clickable(onClick = {
+
+                    }).weight(0.2f),
+                tint = Color.Transparent
+            )
+
+            Icon(
+                painterResource(Res.drawable.confirm),
+                "Confirm",
+                Modifier.fillMaxHeight().width(64.dp).clip(RoundedCornerShape(8.dp))
+                    .clickable(onClick = {
+                        if (title.isNotBlank()) {
+                            val curTime =
+                                ZonedDateTime.now(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                            yukiViewModel.addNote(
+                                Note(
+                                    id = editedNote?.id ?: Uuid.random(),
+                                    title = title,
+                                    content = content,
+                                    createdAt = editedNote?.createdAt ?: curTime,
+                                    updatedAt = curTime,
+                                )
+                            )
+                        } else {
+                            titleError = true
+                        }
+                    }).weight(0.2f),
+                tint = Colors.currentYukiTheme.surface
+            )
+        }
+    }
+}
+
+@Composable
 fun BottomBar(onCancel: () -> Unit, onConfirm: () -> Unit, modifier: Modifier = Modifier) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,

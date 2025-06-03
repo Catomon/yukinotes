@@ -76,6 +76,64 @@ fun BottomBar(
 }
 
 @Composable
+fun BottomBar2(
+    noteSelected: Boolean,
+    isShowConfirmDelete: Boolean,
+    showRemoveConfirm: () -> Unit,
+    removeNote: () -> Unit,
+    cancelRemove: () -> Unit,
+    createNote: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+
+    val buttonSize = sizes.bottomBarSize
+    AnimatedContent(noteSelected, modifier = modifier) {
+        if (it) {
+            AnimatedContent(isShowConfirmDelete && noteSelected) { showConfirm ->
+                if (showConfirm) {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = modifier.fillMaxSize()
+                    ) {
+                        CancelDeleteButton(
+                            cancelRemove,
+                            Modifier.height(buttonSize).weight(0.33f)
+                        )
+                        TrashcanImage(Modifier.height(buttonSize).weight(0.33f))
+                        ConfirmDeleteButton(
+                            removeNote,
+                            Modifier.height(buttonSize).weight(0.33f)
+                        )
+                    }
+                } else {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = modifier.fillMaxSize()
+                    ) {
+                        DeleteButton(
+                            showRemoveConfirm,
+                            Modifier.height(buttonSize).weight(0.50f)
+                        )
+                        CreateButton(createNote, Modifier.height(buttonSize).weight(0.50f))
+                    }
+                }
+            }
+        } else {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = modifier.fillMaxSize()
+            ) {
+//                CreateButton(createNote, Modifier.height(buttonSize).weight(0.33f))
+            }
+        }
+    }
+}
+
+
+@Composable
 private fun EditButton(
     editNote: () -> Unit,
     modifier: Modifier = Modifier

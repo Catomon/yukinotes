@@ -1,5 +1,6 @@
 package com.github.catomon.yukinotes.ui
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -129,6 +131,93 @@ fun NotesScreen(viewModel: YukiViewModel, navController: NavHostController, modi
 }
 
 @Composable
+fun NotesList(viewModel: YukiViewModel, navController: NavHostController, modifier: Modifier = Modifier) {
+    val state by viewModel.notesScreenState.collectAsState()
+
+    var showConfirmDeleteNote by remember { mutableStateOf(false) }
+
+    LaunchedEffect(state.selectedNoteId) {
+        showConfirmDeleteNote = false
+    }
+
+    Box(
+        modifier.fillMaxSize().clickable(
+            interactionSource = remember { MutableInteractionSource() }, indication = null
+        ) {
+            viewModel.selectNote(null)
+        }) {
+            NoteTitlesStaggeredGrid(
+                state,
+                onNoteSelected = { noteId ->
+                    viewModel.selectNote(if (state.selectedNoteId != noteId) noteId else null)
+                },
+                modifier = Modifier.align(Alignment.TopStart)
+                    .padding(horizontal = sizes.notesListPadding)
+            )
+
+        BottomBar2(
+            noteSelected = state.selectedNoteId != null,
+            isShowConfirmDelete = showConfirmDeleteNote,
+            showRemoveConfirm = {
+                showConfirmDeleteNote = true
+            },
+            removeNote = {
+                state.selectedNoteId?.let { selectedNoteId ->
+                    viewModel.removeNote(selectedNoteId)
+                }
+
+                viewModel.selectNote(null)
+            },
+            cancelRemove = {
+                showConfirmDeleteNote = false
+            },
+            createNote = {
+                viewModel.selectNote(null)
+            },
+            modifier = Modifier.align(Alignment.BottomEnd).height(sizes.bottomBarSize)
+                .fillMaxWidth(),
+        )
+    }
+}
+
+@Composable
+fun NoteTitlesStaggeredGrid(
+    state: NotesScreenState, onNoteSelected: (Uuid) -> Unit, modifier: Modifier = Modifier
+) {
+    val notes = state.notes
+    val selectedNoteId = state.selectedNoteId
+    val gridState = rememberLazyStaggeredGridState()
+    val coroutineScope = rememberCoroutineScope()
+
+    LazyVerticalStaggeredGrid(
+        state = gridState,
+        columns = StaggeredGridCells.Adaptive(sizes.noteItemWidth),
+        verticalItemSpacing = 2.dp,
+        horizontalArrangement = Arrangement.spacedBy(2.dp),
+        contentPadding = PaddingValues(
+            start = 0.dp,
+            top = 0.dp,
+            end = 0.dp,
+            bottom = 86.dp
+        ),
+        modifier = modifier
+    ) {
+        items(notes.size) { index ->
+            val note = notes[index]
+
+            TitleNoteItem(
+                { uuid ->
+                    if (selectedNoteId == note.id) coroutineScope.launch {
+                        gridState.animateScrollToItem(index)
+                    }
+                    onNoteSelected(uuid)
+                }, note, selectedNoteId, state
+            )
+        }
+    }
+}
+
+@Composable
 fun NotesStaggeredGrid(
     state: NotesScreenState, onNoteSelected: (Uuid) -> Unit, modifier: Modifier = Modifier
 ) {
@@ -197,6 +286,54 @@ fun NotesList(
         }
     }
 }
+
+@Composable
+fun TitleNoteItem(
+    onNoteSelected: (Uuid) -> Unit, note: NoteEntity, selectedNoteId: Uuid?, state: NotesScreenState
+) {
+    val isSelected = selectedNoteId == note.id
+
+    Box(contentAlignment = Alignment.Center) {
+        Column(
+            Modifier.fillMaxWidth().clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() },
+                onClick = {
+                    onNoteSelected(note.id)
+                }).padding(sizes.noteItemPadding).background(
+                color = Colors.noteBackground, shape = RoundedCornerShape(4.dp)
+            ).let {
+                return@let if (isSelected) {
+                    it.border(2.dp, color = Color.White, shape = RoundedCornerShape(4.dp))
+                } else it
+            }.padding(start = 8.dp)
+        ) {
+            Text(
+                note.title,
+                modifier = Modifier.fillMaxSize().padding(vertical = 6.dp),
+                maxLines = 3,
+                fontSize = sizes.fontHeadline,
+                color = Colors.noteTextHeadline
+            )
+
+            if (true) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.padding(end = 8.dp, bottom = 8.dp).align(Alignment.End)) {
+                    Text(
+                        remember(note.updatedAt) {
+                            epochMillisToSimpleDate(note.updatedAt)
+                        },
+                        color = Colors.noteTextSmall,
+                        maxLines = 1,
+                        fontSize = sizes.fontSmall,
+                    )
+                }
+            }
+        }
+    }
+}
+
 
 @Composable
 fun NoteItem(

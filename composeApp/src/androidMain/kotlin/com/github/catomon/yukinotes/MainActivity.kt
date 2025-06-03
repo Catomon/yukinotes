@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
                     topBar = {
                         TopAppBar(
-                            title = { Text("U-ki Notes") },
+                            title = { Text("yukinotes") },
                             scrollBehavior = scrollBehavior,
                             colors = TopAppBarDefaults.topAppBarColors().copy(containerColor =  Colors.bars, scrolledContainerColor = Colors.bars)
                         )

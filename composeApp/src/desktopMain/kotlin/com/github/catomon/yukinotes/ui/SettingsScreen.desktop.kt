@@ -18,13 +18,7 @@ import java.net.URI
 
 @Composable
 actual fun OpenSourcesText(modifier: Modifier) {
-    Text(
-        "github.com/Catomon",
-        color = Color.White,
-        modifier = modifier.clickable {
-            Desktop.getDesktop().browse(URI("https://github.com/Catomon"))
-        }
-    )
+
 }
 
 @Composable
