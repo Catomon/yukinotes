@@ -1,6 +1,5 @@
 package com.github.catomon.yukinotes.ui
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -37,13 +35,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.github.catomon.yukinotes.data.model.NoteEntity
 import com.github.catomon.yukinotes.epochMillisToSimpleDate
@@ -69,7 +67,7 @@ fun NotesScreen(viewModel: YukiViewModel, navController: NavHostController, modi
     }
 
     Box(
-        modifier.background(color = Colors.bars).fillMaxSize().clickable(
+        modifier.background(color = YukiTheme.bars).fillMaxSize().clickable(
             interactionSource = remember { MutableInteractionSource() }, indication = null
         ) {
             viewModel.selectNote(null)
@@ -211,7 +209,7 @@ fun NoteTitlesStaggeredGrid(
                         gridState.animateScrollToItem(index)
                     }
                     onNoteSelected(uuid)
-                }, note, selectedNoteId, state
+                }, note, selectedNoteId
             )
         }
     }
@@ -289,11 +287,11 @@ fun NotesList(
 
 @Composable
 fun TitleNoteItem(
-    onNoteSelected: (Uuid) -> Unit, note: NoteEntity, selectedNoteId: Uuid?, state: NotesScreenState
+    onNoteSelected: (Uuid) -> Unit, note: NoteEntity, selectedNoteId: Uuid?, modifier: Modifier = Modifier
 ) {
     val isSelected = selectedNoteId == note.id
 
-    Box(contentAlignment = Alignment.Center) {
+    Box(contentAlignment = Alignment.Center, modifier = modifier) {
         Column(
             Modifier.fillMaxWidth().clickable(
                 indication = null,
@@ -301,7 +299,7 @@ fun TitleNoteItem(
                 onClick = {
                     onNoteSelected(note.id)
                 }).padding(sizes.noteItemPadding).background(
-                color = Colors.noteBackground, shape = RoundedCornerShape(4.dp)
+                color = YukiTheme.noteBackground, shape = RoundedCornerShape(4.dp)
             ).let {
                 return@let if (isSelected) {
                     it.border(2.dp, color = Color.White, shape = RoundedCornerShape(4.dp))
@@ -313,7 +311,7 @@ fun TitleNoteItem(
                 modifier = Modifier.fillMaxSize().padding(vertical = 6.dp),
                 maxLines = 3,
                 fontSize = sizes.fontHeadline,
-                color = Colors.noteTextHeadline
+                color = YukiTheme.noteTitle
             )
 
             if (true) {
@@ -324,7 +322,7 @@ fun TitleNoteItem(
                         remember(note.updatedAt) {
                             epochMillisToSimpleDate(note.updatedAt)
                         },
-                        color = Colors.noteTextSmall,
+                        color = YukiTheme.noteDetails,
                         maxLines = 1,
                         fontSize = sizes.fontSmall,
                     )
@@ -352,7 +350,7 @@ fun NoteItem(
                 onClick = {
                     onNoteSelected(note.id)
                 }).padding(sizes.noteItemPadding).background(
-                color = Colors.noteBackground, shape = RoundedCornerShape(4.dp)
+                color = YukiTheme.noteBackground, shape = RoundedCornerShape(4.dp)
             ).let {
                 return@let if (isSelected) {
                     it.border(2.dp, color = Color.White, shape = RoundedCornerShape(4.dp))
@@ -364,14 +362,14 @@ fun NoteItem(
                 modifier = Modifier.fillMaxSize().padding(vertical = 6.dp),
                 maxLines = 3,
                 fontSize = sizes.fontHeadline,
-                color = Colors.noteTextHeadline
+                color = YukiTheme.noteTitle
             )
 
             if (showDetails) {
                 Divider(
                     thickness = sizes.dividerThickness,
                     modifier = Modifier.fillMaxWidth().padding(end = 8.dp, bottom = 6.dp),
-                    color = Colors.dividers
+                    color = YukiTheme.dividers
                 )
 
                 Text(
@@ -381,7 +379,7 @@ fun NoteItem(
                         } else {
                             it.requiredHeightIn(0.dp, 150.dp)
                         }
-                    }, color = Colors.noteText,
+                    }, color = YukiTheme.noteText,
 //                    maxLines = 6,
                     fontSize = sizes.font, overflow = TextOverflow.Ellipsis, onTextLayout = {
                         isContentOverflow = it.hasVisualOverflow
@@ -394,19 +392,20 @@ fun NoteItem(
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier.padding(end = 8.dp, bottom = 8.dp).align(Alignment.End)
-                        .drawBehind {
-                            drawRoundRect(
-                                color = Colors.noteBackground,
-                                topLeft = Offset(0f, 0f + size.height / 3f),
-                                size = Size(size.width, size.height / 1.5f),
-                                cornerRadius = CornerRadius(4f, 4f)
-                            )
-                        }) {
+//                        .drawBehind {
+//                            drawRoundRect(
+//                                color = YukiTheme.noteBackground,
+//                                topLeft = Offset(0f, 0f + size.height / 3f),
+//                                size = Size(size.width, size.height / 1.5f),
+//                                cornerRadius = CornerRadius(4f, 4f)
+//                            )
+//                        }
+                ) {
                     Text(
                         remember(note.updatedAt) {
                             epochMillisToSimpleDate(note.updatedAt)
                         },
-                        color = Colors.noteTextSmall,
+                        color = YukiTheme.noteDetails,
                         maxLines = 1,
                         fontSize = sizes.fontSmall,
                     )
@@ -420,7 +419,7 @@ fun NoteItem(
                 modifier = Modifier.padding(end = 8.dp, bottom = 8.dp).align(Alignment.BottomEnd)
                     .drawBehind {
                         drawRoundRect(
-                            color = Colors.noteBackground,
+                            color = YukiTheme.noteBackground,
                             topLeft = Offset(0f, 0f + size.height / 3f),
                             size = Size(size.width, size.height / 1.5f),
                             cornerRadius = CornerRadius(4f, 4f)
@@ -429,7 +428,7 @@ fun NoteItem(
 
                 Text(
                     "...",
-                    color = Colors.noteText,
+                    color = YukiTheme.noteText,
                     modifier = Modifier.padding(end = 8.dp),
                 )
             }

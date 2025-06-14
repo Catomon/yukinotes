@@ -1,5 +1,8 @@
 package com.github.catomon.yukinotes.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -86,12 +89,12 @@ fun NoteEditScreen(yukiViewModel: YukiViewModel, noteId: String? = null, navBack
                 unfocusedTextColor = Color.White,
                 focusedTextColor = Color.White,
                 cursorColor = Color.White,
-                unfocusedContainerColor = Colors.bars,
-                focusedContainerColor = Colors.bars,
-                errorContainerColor = Colors.bars,
-                unfocusedLabelColor = Colors.currentYukiTheme.surface,
-                focusedLabelColor = Colors.currentYukiTheme.surface,
-                unfocusedIndicatorColor = Colors.bars,
+                unfocusedContainerColor = YukiTheme.bars,
+                focusedContainerColor = YukiTheme.bars,
+                errorContainerColor = YukiTheme.bars,
+                unfocusedLabelColor = YukiTheme.colors.surface,
+                focusedLabelColor = YukiTheme.colors.surface,
+                unfocusedIndicatorColor = YukiTheme.bars,
             ),
             isError = titleError,
         )
@@ -107,18 +110,18 @@ fun NoteEditScreen(yukiViewModel: YukiViewModel, noteId: String? = null, navBack
                 unfocusedTextColor = Color.White,
                 focusedTextColor = Color.White,
                 cursorColor = Color.White,
-                unfocusedContainerColor = Colors.bars,
-                focusedContainerColor = Colors.bars,
-                errorContainerColor = Colors.bars,
-                unfocusedLabelColor = Colors.currentYukiTheme.surface,
-                focusedLabelColor = Colors.currentYukiTheme.surface,
-                unfocusedIndicatorColor = Colors.bars,
+                unfocusedContainerColor = YukiTheme.bars,
+                focusedContainerColor = YukiTheme.bars,
+                errorContainerColor = YukiTheme.bars,
+                unfocusedLabelColor = YukiTheme.colors.surface,
+                focusedLabelColor = YukiTheme.colors.surface,
+                unfocusedIndicatorColor = YukiTheme.bars,
             )
         )
 
         editedNote?.updatedAt?.let { millis ->
-               if (millis > 0)
-            Text("Edited: ${epochMillisToSimpleDate(millis)}", color = Colors.currentYukiTheme.surface)
+            if (millis > 0)
+                Text("Edited: ${epochMillisToSimpleDate(millis)}", color = YukiTheme.colors.surface)
         }
 
         BottomBar(
@@ -148,13 +151,18 @@ fun NoteEditScreen(yukiViewModel: YukiViewModel, noteId: String? = null, navBack
 
 @Composable
 fun NoteEditPane(yukiViewModel: YukiViewModel, noteId: String? = null) {
-    var editedNote by remember { mutableStateOf<Note?>(null) }
+    var note by remember { mutableStateOf<Note?>(null) }
+    var isChanged by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(noteId != null) }
 
-    LaunchedEffect(null) {
+    LaunchedEffect(Unit) {
         if (noteId != null) {
             yukiViewModel.getNoteById(Uuid.parse(noteId))?.toNote()?.let {
-                editedNote = it
+                note = it
             }
+
+            if (note == null)
+                isLoading = false
         }
     }
 
@@ -163,111 +171,125 @@ fun NoteEditPane(yukiViewModel: YukiViewModel, noteId: String? = null) {
 
     var titleError by remember { mutableStateOf(false) }
 
-    LaunchedEffect(editedNote) {
-        title = editedNote?.title ?: ""
-        content = editedNote?.content ?: ""
+    LaunchedEffect(note, isChanged) {
+        if (!isChanged) {
+            title = note?.title ?: ""
+            content = note?.content ?: ""
+
+            if (note != null)
+                isLoading = false
+        }
     }
 
-    Column(
-        Modifier.fillMaxSize(),//.padding(start = 48.dp, end = 48.dp, top = 16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        TextField(
-            value = title,
-            onValueChange = {
-                if (it.length <= 255)
-                    title = it
-
-                if (titleError)
-                    titleError = false
-            },
-            label = { Text("Title:") },
-            modifier = Modifier.fillMaxWidth().padding(
-                start = 4.dp,
-                top = 4.dp,
-                end = 4.dp,
-                bottom = 0.dp
-            ),
-            maxLines = 1,
-            colors = TextFieldDefaults.colors(
-                unfocusedTextColor = Color.White,
-                focusedTextColor = Color.White,
-                cursorColor = Color.White,
-                unfocusedContainerColor = Color.Transparent,
-                focusedContainerColor = Color.Transparent,
-                errorContainerColor = Colors.bars,
-                unfocusedLabelColor = Colors.currentYukiTheme.surface,
-                focusedLabelColor = Colors.currentYukiTheme.surface,
-                unfocusedIndicatorColor = Color.Transparent,
-            ),
-            isError = titleError,
-        )
-
-        TextField(
-            content,
-            {
-                content = it
-            },
-            label = { Text("Details:") },
-            modifier = Modifier.fillMaxWidth().weight(0.99f).padding(vertical = 4.dp),
-            colors = TextFieldDefaults.colors(
-                unfocusedTextColor = Color.White,
-                focusedTextColor = Color.White,
-                cursorColor = Color.White,
-                unfocusedContainerColor = Color.Transparent,
-                focusedContainerColor = Color.Transparent,
-                errorContainerColor = Colors.bars,
-                unfocusedLabelColor = Colors.currentYukiTheme.surface,
-                focusedLabelColor = Colors.currentYukiTheme.surface,
-                unfocusedIndicatorColor = Color.Transparent,
-            )
-        )
-
-        editedNote?.updatedAt?.let { millis ->
-            if (millis > 0)
-                Text("Edited: ${epochMillisToSimpleDate(millis)}", color = Colors.currentYukiTheme.surface)
-        }
-
-
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.height(sizes.bottomBarSize)
+    AnimatedVisibility(!isLoading, enter = fadeIn(), exit = fadeOut()) {
+        Column(
+            Modifier.fillMaxSize(),//.padding(start = 48.dp, end = 48.dp, top = 16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Icon(
-                painterResource(Res.drawable.cancel),
-                null,
-                Modifier.fillMaxHeight().width(64.dp).clip(RoundedCornerShape(8.dp))
-                    .clickable(onClick = {
+            TextField(
+                value = title,
+                onValueChange = {
+                    if (it.length <= 255)
+                        title = it
 
-                    }).weight(0.2f),
-                tint = Color.Transparent
+                    if (titleError)
+                        titleError = false
+
+                    isChanged = true
+                },
+                label = { Text("Title:", color = YukiTheme.textOnBackground) },
+                modifier = Modifier.fillMaxWidth().padding(
+                    start = 4.dp,
+                    top = 4.dp,
+                    end = 4.dp,
+                    bottom = 0.dp
+                ),
+                maxLines = 1,
+                colors = TextFieldDefaults.colors(
+                    unfocusedTextColor = Color.White,
+                    focusedTextColor = Color.White,
+                    cursorColor = Color.White,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
+                    errorContainerColor = Color.Transparent,
+                    unfocusedLabelColor = YukiTheme.colors.surface,
+                    focusedLabelColor = YukiTheme.colors.surface,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent
+                ),
+                isError = titleError,
             )
 
-            Icon(
-                painterResource(Res.drawable.confirm),
-                "Confirm",
-                Modifier.fillMaxHeight().width(64.dp).clip(RoundedCornerShape(8.dp))
-                    .clickable(onClick = {
-                        if (title.isNotBlank()) {
-                            val curTime =
-                                ZonedDateTime.now(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                            yukiViewModel.addNote(
-                                Note(
-                                    id = editedNote?.id ?: Uuid.random(),
-                                    title = title,
-                                    content = content,
-                                    createdAt = editedNote?.createdAt ?: curTime,
-                                    updatedAt = curTime,
-                                )
-                            )
-                        } else {
-                            titleError = true
-                        }
-                    }).weight(0.2f),
-                tint = Colors.currentYukiTheme.surface
+            TextField(
+                content,
+                {
+                    content = it
+                    isChanged = true
+                },
+                label = { Text("Details:", color = YukiTheme.textOnBackground) },
+                modifier = Modifier.fillMaxWidth().weight(0.99f).padding(vertical = 4.dp),
+                colors = TextFieldDefaults.colors(
+                    unfocusedTextColor = Color.White,
+                    focusedTextColor = Color.White,
+                    cursorColor = Color.White,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
+                    errorContainerColor = Color.Transparent,
+                    unfocusedLabelColor = YukiTheme.colors.surface,
+                    focusedLabelColor = YukiTheme.colors.surface,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent
+                )
             )
+
+            note?.updatedAt?.let { millis ->
+                if (millis > 0)
+                    Text("Edited: ${epochMillisToSimpleDate(millis)}", color = YukiTheme.textOnBackground)
+            }
+
+            if (isChanged)
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.height(sizes.bottomBarSize)
+                ) {
+                    Icon(
+                        painterResource(Res.drawable.cancel),
+                        "Undo changes",
+                        Modifier.fillMaxHeight().width(64.dp).clip(RoundedCornerShape(8.dp))
+                            .clickable(onClick = {
+                                isChanged = false
+                            }).weight(0.2f),
+                        tint = YukiTheme.textOnBackground
+                    )
+
+                    Icon(
+                        painterResource(Res.drawable.confirm),
+                        "Confirm",
+                        Modifier.fillMaxHeight().width(64.dp).clip(RoundedCornerShape(8.dp))
+                            .clickable(onClick = {
+                                if (title.isNotBlank()) {
+                                    val curTime =
+                                        ZonedDateTime.now(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                                    yukiViewModel.addNote(
+                                        Note(
+                                            id = note?.id ?: Uuid.random(),
+                                            title = title,
+                                            content = content,
+                                            createdAt = note?.createdAt ?: curTime,
+                                            updatedAt = curTime,
+                                        )
+                                    )
+
+                                    isChanged = false
+                                } else {
+                                    titleError = true
+                                }
+                            }).weight(0.2f),
+                        tint = YukiTheme.textOnBackground
+                    )
+                }
         }
     }
 }
@@ -277,14 +299,14 @@ fun BottomBar(onCancel: () -> Unit, onConfirm: () -> Unit, modifier: Modifier = 
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.background(Colors.bars)
+        modifier = modifier.background(YukiTheme.bars)
     ) {
         Icon(
             painterResource(Res.drawable.cancel),
             "Cancel",
             Modifier.fillMaxHeight().width(64.dp).clip(RoundedCornerShape(8.dp))
                 .clickable(onClick = onCancel).weight(0.2f),
-            tint = Colors.currentYukiTheme.surface
+            tint = YukiTheme.colors.surface
         )
 
         Icon(
@@ -292,7 +314,7 @@ fun BottomBar(onCancel: () -> Unit, onConfirm: () -> Unit, modifier: Modifier = 
             "Confirm",
             Modifier.fillMaxHeight().width(64.dp).clip(RoundedCornerShape(8.dp))
                 .clickable(onClick = onConfirm).weight(0.2f),
-            tint = Colors.currentYukiTheme.surface
+            tint = YukiTheme.colors.surface
         )
     }
 }

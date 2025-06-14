@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.catomon.yukinotes.UserSettings
 import com.github.catomon.yukinotes.data.model.NoteEntity
-import com.github.catomon.yukinotes.data.repository.YukiRepository
+import com.github.catomon.yukinotes.domain.YukiRepository
 import com.github.catomon.yukinotes.domain.Note
 import com.github.catomon.yukinotes.exportNotesAsTxt
 import com.github.catomon.yukinotes.loadSettings

@@ -29,7 +29,7 @@ fun BottomBar(
 ) {
 
     val buttonSize = sizes.bottomBarSize
-    AnimatedContent(noteSelected, modifier = modifier.background(Colors.bars)) {
+    AnimatedContent(noteSelected, modifier = modifier.background(YukiTheme.bars)) {
         if (it) {
             AnimatedContent(isShowConfirmDelete && noteSelected) { showConfirm ->
                 if (showConfirm) {
@@ -144,7 +144,7 @@ private fun EditButton(
         modifier = modifier
             .clip(RoundedCornerShape(10.dp))
             .clickable(onClick = editNote),
-        tint = Colors.currentYukiTheme.surface
+        tint = YukiTheme.colors.surface
     )
 }
 
@@ -159,7 +159,7 @@ private fun CreateButton(
         modifier = modifier
             .clip(RoundedCornerShape(10.dp))
             .clickable(onClick = createNote),
-        tint = Colors.currentYukiTheme.surface
+        tint = YukiTheme.colors.surface
     )
 }
 
@@ -174,7 +174,7 @@ private fun DeleteButton(
         modifier = modifier
             .clip(RoundedCornerShape(10.dp))
             .clickable(onClick = showRemoveConfirm),
-        tint = Colors.currentYukiTheme.surface
+        tint = YukiTheme.colors.surface
     )
 }
 
@@ -189,7 +189,7 @@ private fun ConfirmDeleteButton(
         modifier = modifier
             .clip(RoundedCornerShape(10.dp))
             .clickable(onClick = removeNote),
-        tint = Colors.currentYukiTheme.surface
+        tint = YukiTheme.colors.surface
     )
 }
 
@@ -201,7 +201,7 @@ private fun TrashcanImage(
         painterResource(YukiIcons.confirmDeleteNote),
         contentDescription = "Trashcan",
         modifier = modifier.clip(RoundedCornerShape(10.dp)),
-        tint = Colors.currentYukiTheme.surface
+        tint = YukiTheme.colors.surface
     )
 }
 
@@ -216,6 +216,6 @@ private fun CancelDeleteButton(
         modifier = modifier
             .clip(RoundedCornerShape(10.dp))
             .clickable(onClick = cancelRemove),
-        tint = Colors.currentYukiTheme.surface
+        tint = YukiTheme.colors.surface
     )
 }

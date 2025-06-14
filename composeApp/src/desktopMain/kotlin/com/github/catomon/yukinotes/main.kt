@@ -18,7 +18,6 @@ import androidx.compose.ui.window.WindowScope
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
 import com.github.catomon.yukinotes.di.appModule
-import com.github.catomon.yukinotes.ui.Colors
 import com.github.catomon.yukinotes.ui.YukiApp
 import com.github.catomon.yukinotes.ui.YukiAppDesktopScreen
 import com.github.catomon.yukinotes.ui.YukiTheme
@@ -67,23 +66,25 @@ fun WindowScope.App() {
     WindowDraggableArea {
         YukiTheme {
             if (isTransparent)
-                YukiAppDesktopScreen(Modifier.padding(8.dp)
+                YukiAppDesktopScreen(
+                    Modifier.padding(8.dp)
                     .customShadow()
-                    .drawBehind {
-                        drawRoundRect(
-                            color = Colors.currentYukiTheme.barsShadow,
-                            topLeft = Offset(0f, 2f),
-                            size = this.size,
-                            cornerRadius = CornerRadius(12f)
-                        )
-                        drawRoundRect(
-                            color = Colors.currentYukiTheme.bars,
-                            topLeft = Offset(0f, -2f),
-                            size = this.size,
-                            cornerRadius = CornerRadius(12f)
-                        )
-                    }
-                    .clip(RoundedCornerShape(12.dp)))
+//                    .drawBehind {
+//                        drawRoundRect(
+//                            color = YukiTheme.colors.barsShadow,
+//                            topLeft = Offset(0f, 2f),
+//                            size = this.size,
+//                            cornerRadius = CornerRadius(12f)
+//                        )
+//                        drawRoundRect(
+//                            color = YukiTheme.colors.bars,
+//                            topLeft = Offset(0f, -2f),
+//                            size = this.size,
+//                            cornerRadius = CornerRadius(12f)
+//                        )
+//                    }
+                    .clip(RoundedCornerShape(12.dp))
+                )
             else
                 YukiApp()
         }

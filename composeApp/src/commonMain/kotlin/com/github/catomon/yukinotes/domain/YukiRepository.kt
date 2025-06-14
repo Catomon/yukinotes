@@ -1,4 +1,4 @@
-package com.github.catomon.yukinotes.data.repository
+package com.github.catomon.yukinotes.domain
 
 import com.github.catomon.yukinotes.data.model.NoteEntity
 import kotlinx.coroutines.flow.Flow

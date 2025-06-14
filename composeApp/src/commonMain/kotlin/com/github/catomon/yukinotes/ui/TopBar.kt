@@ -1,6 +1,5 @@
 package com.github.catomon.yukinotes.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -14,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.github.catomon.yukinotes.Const
 import org.jetbrains.compose.resources.painterResource
@@ -33,12 +31,12 @@ fun TopBar(openSettings: () -> Unit, modifier: Modifier = Modifier) {
                 painterResource(YukiIcons.appIcon),
                 "App Icon",
                 Modifier.size(sizes.topBarSize),
-                tint = Colors.currentYukiTheme.surface
+                tint = YukiTheme.colors.font
             )
 
             Text(
                 Const.APP_NAME,
-                color = Colors.currentYukiTheme.surface,
+                color = YukiTheme.colors.font,
                 modifier = Modifier.padding(start = 3.dp),
                 fontSize = sizes.fontHeadline
             )

@@ -2,6 +2,7 @@ package com.github.catomon.yukinotes.data.repository
 
 import com.github.catomon.yukinotes.data.dao.NoteDao
 import com.github.catomon.yukinotes.data.model.NoteEntity
+import com.github.catomon.yukinotes.domain.YukiRepository
 import kotlinx.coroutines.flow.Flow
 import kotlin.uuid.Uuid
 

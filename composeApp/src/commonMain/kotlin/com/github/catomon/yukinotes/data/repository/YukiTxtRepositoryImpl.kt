@@ -1,6 +1,7 @@
 package com.github.catomon.yukinotes.data.repository
 
 import com.github.catomon.yukinotes.data.model.NoteEntity
+import com.github.catomon.yukinotes.domain.YukiRepository
 import com.github.catomon.yukinotes.userFolderPath
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

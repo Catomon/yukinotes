@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
@@ -41,39 +42,53 @@ fun YukiAppDesktopScreen(modifier: Modifier = Modifier.Companion) {
     val yukiViewModel: YukiViewModel = remember { KoinJavaComponent.get(YukiViewModel::class.java) }
     val navController: NavHostController = rememberNavController()
     val settings by yukiViewModel.userSettings
-    var topBarColor by remember { mutableStateOf(Colors.bars) }
-    LaunchedEffect(settings.theme) {
-        Colors.currentYukiTheme = Themes.forNameOrFirst(settings.theme)
-        Colors.updateTheme()
-        topBarColor = Colors.bars
+    var backgroundColor by remember { mutableStateOf(YukiTheme.background) }
+    LaunchedEffect(settings) {
+        YukiTheme.colors = Themes.forNameOrFirst(settings.theme)
+        YukiTheme.updateTheme()
+        backgroundColor = YukiTheme.background
     }
 
     Box(modifier) {
-        Image(painterResource(Res.drawable.background), null, Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp)), contentScale = ContentScale.Crop)
+        Image(
+            painterResource(Res.drawable.background),
+            null,
+            Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp)),
+            contentScale = ContentScale.Crop
+        )
 
         Column(Modifier.fillMaxSize()) {
-            TopBar(
-                openSettings = {
-                    val currentRoute = navController.currentBackStackEntry?.destination?.route
-                    if (currentRoute == Routes.SETTINGS) {
-                        navController.popBackStack()
-                    } else {
-                        navController.navigate(Routes.SETTINGS)
-                    }
-                },
-                Modifier.background(topBarColor)
-            )
-
             NavHost(
                 navController,
                 startDestination = Routes.NOTES,
-                modifier = Modifier.fillMaxSize().background(color = Colors.bars),
+                modifier = Modifier.fillMaxSize().background(color = backgroundColor),
                 enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left) },
                 exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right) },
             ) {
                 composable(Routes.NOTES) {
                     Row(Modifier.fillMaxSize()) {
-                        NotesList(yukiViewModel, navController, Modifier.width(200.dp))
+                        Column(
+                            Modifier.width(200.dp).background(
+                                color = YukiTheme.bars,
+                                shape = RoundedCornerShape(topEnd = 12.dp, bottomEnd = 12.dp)
+                            )
+                        ) {
+                            Row(Modifier.fillMaxWidth()) {
+                                TopBar(
+                                    openSettings = {
+                                        val currentRoute = navController.currentBackStackEntry?.destination?.route
+                                        if (currentRoute == Routes.SETTINGS) {
+                                            navController.popBackStack()
+                                        } else {
+                                            navController.navigate(Routes.SETTINGS)
+                                        }
+                                    }
+                                )
+                            }
+
+                            NotesList(yukiViewModel, navController, Modifier.fillMaxSize())
+                        }
+
 
                         val notesScreenState by yukiViewModel.notesScreenState.collectAsState()
                         val noteId by remember(notesScreenState) { mutableStateOf(notesScreenState.selectedNoteId?.toString()) }
@@ -91,17 +106,30 @@ fun YukiAppDesktopScreen(modifier: Modifier = Modifier.Companion) {
                                 )
                             }
                         }
-
                     }
                 }
 
                 composable(Routes.SETTINGS) {
-                    SettingsScreen(yukiViewModel, navBack = {
-                        navController.popBackStack(
-                            Routes.NOTES,
-                            inclusive = false
+                    Column {
+                        TopBar(
+                            openSettings = {
+                                val currentRoute = navController.currentBackStackEntry?.destination?.route
+                                if (currentRoute == Routes.SETTINGS) {
+                                    navController.popBackStack()
+                                } else {
+                                    navController.navigate(Routes.SETTINGS)
+                                }
+                            },
+                            Modifier.fillMaxWidth()
                         )
-                    })
+
+                        SettingsScreen(yukiViewModel, navBack = {
+                            navController.popBackStack(
+                                Routes.NOTES,
+                                inclusive = false
+                            )
+                        })
+                    }
                 }
             }
         }

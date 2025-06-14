@@ -28,11 +28,11 @@ fun YukiApp(modifier: Modifier = Modifier) {
     val yukiViewModel: YukiViewModel = remember { get(YukiViewModel::class.java) }
     val navController: NavHostController = rememberNavController()
     val settings by yukiViewModel.userSettings
-    var topBarColor by remember { mutableStateOf(Colors.bars) }
+    var topBarColor by remember { mutableStateOf(YukiTheme.bars) }
     LaunchedEffect(settings.theme) {
-        Colors.currentYukiTheme = Themes.forNameOrFirst(settings.theme)
-        Colors.updateTheme()
-        topBarColor = Colors.bars
+        YukiTheme.colors = Themes.forNameOrFirst(settings.theme)
+        YukiTheme.updateTheme()
+        topBarColor = YukiTheme.bars
     }
 
     Column(modifier) {
@@ -51,7 +51,7 @@ fun YukiApp(modifier: Modifier = Modifier) {
         NavHost(
             navController,
             startDestination = Routes.NOTES,
-            modifier = Modifier.fillMaxSize().background(color = Colors.bars),
+            modifier = Modifier.fillMaxSize().background(color = YukiTheme.bars),
             enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left) },
             exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right) },
         ) {

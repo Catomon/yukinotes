@@ -19,7 +19,7 @@ actual fun PlatformActionButton() {
         Modifier.size(sizes.topBarSize).clickable(onClick = {
             window.isMinimized = true
         }),
-        tint = Colors.currentYukiTheme.surface
+        tint = YukiTheme.colors.surface
     )
 }
 
