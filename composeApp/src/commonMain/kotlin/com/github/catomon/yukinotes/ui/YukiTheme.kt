@@ -111,7 +111,7 @@ object YukiTheme {
     var background = violet
     var bars = Color(255, 148, 255)
     var dividers = Color(255, 148, 255)
-    var textOnBackground = background.copy(1f).darken(0.6f)
+    var textOnBackground = background.copy(1f).darken(0.75f)
 
     init {
         colors =

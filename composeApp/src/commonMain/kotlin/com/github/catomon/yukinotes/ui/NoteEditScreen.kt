@@ -187,47 +187,51 @@ fun NoteEditPane(yukiViewModel: YukiViewModel, noteId: String? = null) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+//            TextField(
+//                value = title,
+//                onValueChange = {
+//                    if (it.length <= 255)
+//                        title = it
+//
+//                    if (titleError)
+//                        titleError = false
+//
+//                    isChanged = true
+//                },
+//                label = { Text("Title:", color = YukiTheme.noteDetails) },
+//                modifier = Modifier.fillMaxWidth().padding(
+//                    start = 4.dp,
+//                    top = 4.dp,
+//                    end = 4.dp,
+//                    bottom = 0.dp
+//                ),
+//                maxLines = 1,
+//                colors = TextFieldDefaults.colors(
+//                    unfocusedTextColor = Color.White,
+//                    focusedTextColor = Color.White,
+//                    cursorColor = Color.White,
+//                    unfocusedContainerColor = Color.Transparent,
+//                    focusedContainerColor = Color.Transparent,
+//                    errorContainerColor = Color.Transparent,
+//                    unfocusedLabelColor = YukiTheme.colors.surface,
+//                    focusedLabelColor = YukiTheme.colors.surface,
+//                    unfocusedIndicatorColor = Color.Transparent,
+//                    focusedIndicatorColor = Color.Transparent
+//                ),
+//                isError = titleError,
+//            )
+
             TextField(
-                value = title,
-                onValueChange = {
-                    if (it.length <= 255)
-                        title = it
+                content,
+                {
+                    content = it
 
                     if (titleError)
                         titleError = false
 
                     isChanged = true
                 },
-                label = { Text("Title:", color = YukiTheme.textOnBackground) },
-                modifier = Modifier.fillMaxWidth().padding(
-                    start = 4.dp,
-                    top = 4.dp,
-                    end = 4.dp,
-                    bottom = 0.dp
-                ),
-                maxLines = 1,
-                colors = TextFieldDefaults.colors(
-                    unfocusedTextColor = Color.White,
-                    focusedTextColor = Color.White,
-                    cursorColor = Color.White,
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedContainerColor = Color.Transparent,
-                    errorContainerColor = Color.Transparent,
-                    unfocusedLabelColor = YukiTheme.colors.surface,
-                    focusedLabelColor = YukiTheme.colors.surface,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent
-                ),
-                isError = titleError,
-            )
-
-            TextField(
-                content,
-                {
-                    content = it
-                    isChanged = true
-                },
-                label = { Text("Details:", color = YukiTheme.textOnBackground) },
+                label = { Text("Note:", color = YukiTheme.noteDetails) },
                 modifier = Modifier.fillMaxWidth().weight(0.99f).padding(vertical = 4.dp),
                 colors = TextFieldDefaults.colors(
                     unfocusedTextColor = Color.White,
@@ -245,7 +249,7 @@ fun NoteEditPane(yukiViewModel: YukiViewModel, noteId: String? = null) {
 
             note?.updatedAt?.let { millis ->
                 if (millis > 0)
-                    Text("Edited: ${epochMillisToSimpleDate(millis)}", color = YukiTheme.textOnBackground)
+                    Text("Edited: ${epochMillisToSimpleDate(millis)}", color = YukiTheme.noteDetails)
             }
 
             if (isChanged)
@@ -261,7 +265,7 @@ fun NoteEditPane(yukiViewModel: YukiViewModel, noteId: String? = null) {
                             .clickable(onClick = {
                                 isChanged = false
                             }).weight(0.2f),
-                        tint = YukiTheme.textOnBackground
+                        tint = YukiTheme.noteDetails
                     )
 
                     Icon(
@@ -269,17 +273,20 @@ fun NoteEditPane(yukiViewModel: YukiViewModel, noteId: String? = null) {
                         "Confirm",
                         Modifier.fillMaxHeight().width(64.dp).clip(RoundedCornerShape(8.dp))
                             .clickable(onClick = {
+                                title = content.lines().first().take(255)
+
                                 if (title.isNotBlank()) {
                                     val curTime =
                                         ZonedDateTime.now(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                                    note = Note(
+                                        id = note?.id ?: Uuid.random(),
+                                        title = title,
+                                        content = content,
+                                        createdAt = note?.createdAt ?: curTime,
+                                        updatedAt = curTime,
+                                    )
                                     yukiViewModel.addNote(
-                                        Note(
-                                            id = note?.id ?: Uuid.random(),
-                                            title = title,
-                                            content = content,
-                                            createdAt = note?.createdAt ?: curTime,
-                                            updatedAt = curTime,
-                                        )
+                                        note!!
                                     )
 
                                     isChanged = false
@@ -287,7 +294,7 @@ fun NoteEditPane(yukiViewModel: YukiViewModel, noteId: String? = null) {
                                     titleError = true
                                 }
                             }).weight(0.2f),
-                        tint = YukiTheme.textOnBackground
+                        tint = YukiTheme.noteDetails
                     )
                 }
         }

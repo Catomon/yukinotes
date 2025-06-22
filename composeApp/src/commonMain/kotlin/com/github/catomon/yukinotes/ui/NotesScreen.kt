@@ -138,7 +138,7 @@ fun NotesList(viewModel: YukiViewModel, navController: NavHostController, modifi
         showConfirmDeleteNote = false
     }
 
-    Box(
+    Column(
         modifier.fillMaxSize().clickable(
             interactionSource = remember { MutableInteractionSource() }, indication = null
         ) {
@@ -149,7 +149,7 @@ fun NotesList(viewModel: YukiViewModel, navController: NavHostController, modifi
                 onNoteSelected = { noteId ->
                     viewModel.selectNote(if (state.selectedNoteId != noteId) noteId else null)
                 },
-                modifier = Modifier.align(Alignment.TopStart)
+                modifier = Modifier.fillMaxWidth().weight(1f)
                     .padding(horizontal = sizes.notesListPadding)
             )
 
@@ -172,7 +172,7 @@ fun NotesList(viewModel: YukiViewModel, navController: NavHostController, modifi
             createNote = {
                 viewModel.selectNote(null)
             },
-            modifier = Modifier.align(Alignment.BottomEnd).height(sizes.bottomBarSize)
+            modifier = Modifier.height(sizes.bottomBarSize)
                 .fillMaxWidth(),
         )
     }
