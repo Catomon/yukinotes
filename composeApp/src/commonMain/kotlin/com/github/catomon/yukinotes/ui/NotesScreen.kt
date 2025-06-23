@@ -314,20 +314,20 @@ fun TitleNoteItem(
                 color = YukiTheme.noteTitle
             )
 
-            if (true) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier.padding(end = 8.dp, bottom = 8.dp).align(Alignment.End)) {
-                    Text(
-                        remember(note.updatedAt) {
-                            epochMillisToSimpleDate(note.updatedAt)
-                        },
-                        color = YukiTheme.noteDetails,
-                        maxLines = 1,
-                        fontSize = sizes.fontSmall,
-                    )
-                }
-            }
+//            if (true) {
+//                Box(
+//                    contentAlignment = Alignment.Center,
+//                    modifier = Modifier.padding(end = 8.dp, bottom = 8.dp).align(Alignment.End)) {
+//                    Text(
+//                        remember(note.updatedAt) {
+//                            epochMillisToSimpleDate(note.updatedAt)
+//                        },
+//                        color = YukiTheme.noteDetails,
+//                        maxLines = 1,
+//                        fontSize = sizes.fontSmall,
+//                    )
+//                }
+//            }
         }
     }
 }
