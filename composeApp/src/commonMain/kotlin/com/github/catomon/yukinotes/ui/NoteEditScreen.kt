@@ -15,7 +15,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -28,11 +30,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.github.catomon.yukinotes.data.mappers.toNote
 import com.github.catomon.yukinotes.domain.Note
 import com.github.catomon.yukinotes.epochMillisToSimpleDate
+import com.github.catomon.yukinotes.ui.util.darken
 import org.jetbrains.compose.resources.painterResource
 import yukinotes.composeapp.generated.resources.Res
 import yukinotes.composeapp.generated.resources.cancel
@@ -221,9 +226,9 @@ fun NoteEditPane(yukiViewModel: YukiViewModel, noteId: String? = null) {
 //                isError = titleError,
 //            )
 
-            TextField(
-                content,
-                {
+            BasicTextField(
+                value = content,
+               onValueChange =  {
                     content = it
 
                     if (titleError)
@@ -231,20 +236,33 @@ fun NoteEditPane(yukiViewModel: YukiViewModel, noteId: String? = null) {
 
                     isChanged = true
                 },
-                label = { Text("Note:", color = YukiTheme.noteDetails) },
-                modifier = Modifier.fillMaxWidth().weight(0.99f).padding(vertical = 4.dp),
-                colors = TextFieldDefaults.colors(
-                    unfocusedTextColor = Color.White,
-                    focusedTextColor = Color.White,
-                    cursorColor = Color.White,
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedContainerColor = Color.Transparent,
-                    errorContainerColor = Color.Transparent,
-                    unfocusedLabelColor = YukiTheme.colors.surface,
-                    focusedLabelColor = YukiTheme.colors.surface,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent
-                )
+                textStyle = LocalTextStyle.current,
+              //  label = { Text("Note:", color = YukiTheme.noteDetails) },
+                modifier = Modifier.fillMaxWidth().weight(0.99f).drawBehind {
+                    val lineHeight = sizes.fontLineHeight.toPx()
+                    val lines = (size.height / lineHeight).toInt()
+                    for (i in 1..lines) {
+                        val y = i * lineHeight + 5f
+                        drawLine(
+                            color = YukiTheme.colors.background.darken(0.90f),
+                            start = Offset(0f, y),
+                            end = Offset(size.width, y),
+                            strokeWidth = 1.dp.toPx()
+                        )
+                    }
+                }.padding(vertical = 4.dp),
+//                colors = TextFieldDefaults.colors(
+//                    unfocusedTextColor = Color.White,
+//                    focusedTextColor = Color.White,
+//                    cursorColor = Color.White,
+//                    unfocusedContainerColor = Color.Transparent,
+//                    focusedContainerColor = Color.Transparent,
+//                    errorContainerColor = Color.Transparent,
+//                    unfocusedLabelColor = YukiTheme.colors.surface,
+//                    focusedLabelColor = YukiTheme.colors.surface,
+//                    unfocusedIndicatorColor = Color.Transparent,
+//                    focusedIndicatorColor = Color.Transparent
+//                )
             )
 
             note?.updatedAt?.let { millis ->

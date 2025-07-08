@@ -44,7 +44,7 @@ fun main() = application {
     val windowState = WindowState(width = 600.dp, height = 500.dp) //400 / 710
     Window(
         onCloseRequest = ::exitApplication,
-        title = "yukinotes",
+        title = "YukiNotes",
         undecorated = true,
         transparent = isTransparent,
         state = windowState,

@@ -21,6 +21,18 @@ object Themes {
 
     class Pink : IYukiTheme {
         override val name: String = "yuki"
+        override val background = Color(0xffff98b3)
+        override val surface =  Color(0xcdff98b3) //Color(0xffffc5d6).copy(0.4f)
+        override val surfaceSecondary = Color(0xffc23a80)
+        override val font = Color(0xFFFFFFFF)
+        override val fontSecondary = Color(0xFFFFE1EA)
+        override val bars = Color(0xffe9678f).copy(0.9f)
+        override val barsShadow = Color(0xff000000)
+    }
+
+
+    class LuckyDark : IYukiTheme {
+        override val name: String = "lucky_dark"
         override val background = Color(0xff000000)
         override val surface = Color(0xffc33c83)  //Color(0xffffc5d6).copy(0.4f)
         override val surfaceSecondary = Color(0xffc23a80)
@@ -81,9 +93,9 @@ fun YukiTheme(content: @Composable () -> Unit) {
         titleMedium = defaultTypography.titleMedium.copy(fontFamily = fontFamily),
         titleSmall = defaultTypography.titleSmall.copy(fontFamily = fontFamily),
 
-        bodyLarge = defaultTypography.bodyLarge.copy(fontFamily = fontFamily, fontSize = sizes.font, lineHeight = sizes.fontLineHeight),
-        bodyMedium = defaultTypography.bodyMedium.copy(fontFamily = fontFamily, fontSize = sizes.font, lineHeight = sizes.fontLineHeight),
-        bodySmall = defaultTypography.bodySmall.copy(fontFamily = fontFamily, fontSize = sizes.font, lineHeight = sizes.fontLineHeight),
+        bodyLarge = defaultTypography.bodyLarge.copy(fontFamily = fontFamily, fontSize = sizes.font, lineHeight = sizes.fontLineHeight, color = Color.White),
+        bodyMedium = defaultTypography.bodyMedium.copy(fontFamily = fontFamily, fontSize = sizes.font, lineHeight = sizes.fontLineHeight, color = Color.White),
+        bodySmall = defaultTypography.bodySmall.copy(fontFamily = fontFamily, fontSize = sizes.font, lineHeight = sizes.fontLineHeight, color = Color.White),
 
         labelLarge = defaultTypography.labelLarge.copy(fontFamily = fontFamily),
         labelMedium = defaultTypography.labelMedium.copy(fontFamily = fontFamily),

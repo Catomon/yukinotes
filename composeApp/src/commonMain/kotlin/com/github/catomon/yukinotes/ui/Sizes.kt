@@ -22,7 +22,7 @@ interface Sizes {
 
     val noteItemWidth: Dp
 
-    val fontLineHeight get() = (font.value + 2.sp.value).sp
-    val fontHeadlineLineHeight get() = (fontHeadline.value + 2.sp.value).sp
-    val fontSmallLineHeight get() = (fontSmall.value + 2.sp.value).sp
+    val fontLineHeight get() = (font.value + 4.sp.value).sp
+    val fontHeadlineLineHeight get() = (fontHeadline.value + 4.sp.value).sp
+    val fontSmallLineHeight get() = (fontSmall.value + 4.sp.value).sp
 }
