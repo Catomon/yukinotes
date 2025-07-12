@@ -86,7 +86,7 @@ fun WindowScope.App() {
                     .clip(RoundedCornerShape(12.dp))
                 )
             else
-                YukiApp()
+                YukiAppDesktopScreen()
         }
     }
 }

@@ -192,43 +192,9 @@ fun NoteEditPane(yukiViewModel: YukiViewModel, noteId: String? = null) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-//            TextField(
-//                value = title,
-//                onValueChange = {
-//                    if (it.length <= 255)
-//                        title = it
-//
-//                    if (titleError)
-//                        titleError = false
-//
-//                    isChanged = true
-//                },
-//                label = { Text("Title:", color = YukiTheme.noteDetails) },
-//                modifier = Modifier.fillMaxWidth().padding(
-//                    start = 4.dp,
-//                    top = 4.dp,
-//                    end = 4.dp,
-//                    bottom = 0.dp
-//                ),
-//                maxLines = 1,
-//                colors = TextFieldDefaults.colors(
-//                    unfocusedTextColor = Color.White,
-//                    focusedTextColor = Color.White,
-//                    cursorColor = Color.White,
-//                    unfocusedContainerColor = Color.Transparent,
-//                    focusedContainerColor = Color.Transparent,
-//                    errorContainerColor = Color.Transparent,
-//                    unfocusedLabelColor = YukiTheme.colors.surface,
-//                    focusedLabelColor = YukiTheme.colors.surface,
-//                    unfocusedIndicatorColor = Color.Transparent,
-//                    focusedIndicatorColor = Color.Transparent
-//                ),
-//                isError = titleError,
-//            )
-
             BasicTextField(
                 value = content,
-               onValueChange =  {
+                onValueChange = {
                     content = it
 
                     if (titleError)
@@ -237,8 +203,8 @@ fun NoteEditPane(yukiViewModel: YukiViewModel, noteId: String? = null) {
                     isChanged = true
                 },
                 textStyle = LocalTextStyle.current,
-              //  label = { Text("Note:", color = YukiTheme.noteDetails) },
-                modifier = Modifier.fillMaxWidth().weight(0.99f).drawBehind {
+                //  label = { Text("Note:", color = YukiTheme.noteDetails) },
+                modifier = Modifier.fillMaxWidth().weight(0.99f).padding(horizontal = 4.dp).drawBehind {
                     val lineHeight = sizes.fontLineHeight.toPx()
                     val lines = (size.height / lineHeight).toInt()
                     for (i in 1..lines) {

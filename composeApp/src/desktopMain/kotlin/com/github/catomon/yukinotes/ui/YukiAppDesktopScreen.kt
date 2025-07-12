@@ -3,15 +3,25 @@ package com.github.catomon.yukinotes.ui
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -21,6 +31,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -30,11 +41,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.github.catomon.yukinotes.Const
+import com.github.catomon.yukinotes.LocalWindow
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.java.KoinJavaComponent
 import yukinotes.composeapp.generated.resources.Res
 import yukinotes.composeapp.generated.resources.background
+import yukinotes.composeapp.generated.resources.minimize
 
 @Composable
 @Preview
@@ -111,17 +125,43 @@ fun YukiAppDesktopScreen(modifier: Modifier = Modifier.Companion) {
 
                 composable(Routes.SETTINGS) {
                     Column {
-                        TopBar(
-                            openSettings = {
-                                val currentRoute = navController.currentBackStackEntry?.destination?.route
-                                if (currentRoute == Routes.SETTINGS) {
-                                    navController.popBackStack()
-                                } else {
-                                    navController.navigate(Routes.SETTINGS)
-                                }
-                            },
-                            Modifier.fillMaxWidth()
-                        )
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.height(sizes.topBarSize).fillMaxWidth()
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.clip(RoundedCornerShape(8.dp)).clickable {
+                                    val currentRoute = navController.currentBackStackEntry?.destination?.route
+                                    if (currentRoute == Routes.SETTINGS) {
+                                        navController.popBackStack()
+                                    } else {
+                                        navController.navigate(Routes.SETTINGS)
+                                    }
+                                }) {
+                                Icon(
+                                    Icons.Default.ArrowBack,
+                                    null,
+                                    Modifier.size(sizes.topBarSize),
+                                    tint = YukiTheme.colors.font
+                                )
+
+                                Text("back")
+                            }
+
+                            Spacer(Modifier.weight(2f))
+
+                            val window = LocalWindow.current
+                            Icon(
+                                painterResource(Res.drawable.minimize),
+                                "App Menu",
+                                Modifier.size(sizes.topBarSize).clickable(onClick = {
+                                    window.isMinimized = true
+                                }),
+                                tint = YukiTheme.colors.font
+                            )
+                        }
 
                         SettingsScreen(yukiViewModel, navBack = {
                             navController.popBackStack(
