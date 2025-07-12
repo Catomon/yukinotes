@@ -31,12 +31,12 @@ fun TopBar(openSettings: () -> Unit, modifier: Modifier = Modifier) {
                 painterResource(YukiIcons.appIcon),
                 "App Icon",
                 Modifier.size(sizes.topBarSize),
-                tint = YukiTheme.colors.font
+                tint = YukiTheme.colors.text
             )
 
             Text(
                 Const.APP_NAME,
-                color = YukiTheme.colors.font,
+                color = YukiTheme.colors.text,
                 modifier = Modifier.padding(start = 3.dp),
                 fontSize = sizes.fontHeadline
             )

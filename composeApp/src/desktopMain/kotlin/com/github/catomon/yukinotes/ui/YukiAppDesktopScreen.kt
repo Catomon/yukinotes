@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -41,7 +40,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.github.catomon.yukinotes.Const
 import com.github.catomon.yukinotes.LocalWindow
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -105,7 +103,7 @@ fun YukiAppDesktopScreen(modifier: Modifier = Modifier.Companion) {
 
 
                         val notesScreenState by yukiViewModel.notesScreenState.collectAsState()
-                        val noteId by remember(notesScreenState) { mutableStateOf(notesScreenState.selectedNoteId?.toString()) }
+                        val noteId by remember(notesScreenState) { mutableStateOf(if (notesScreenState.selectedNotes.size == 1) notesScreenState.selectedNotes.firstOrNull()?.toString() else null) }
 
                         val customSelectionColors = TextSelectionColors(
                             handleColor = Color.Companion.Gray,
@@ -144,7 +142,7 @@ fun YukiAppDesktopScreen(modifier: Modifier = Modifier.Companion) {
                                     Icons.Default.ArrowBack,
                                     null,
                                     Modifier.size(sizes.topBarSize),
-                                    tint = YukiTheme.colors.font
+                                    tint = YukiTheme.colors.text
                                 )
 
                                 Text("back")
@@ -159,7 +157,7 @@ fun YukiAppDesktopScreen(modifier: Modifier = Modifier.Companion) {
                                 Modifier.size(sizes.topBarSize).clickable(onClick = {
                                     window.isMinimized = true
                                 }),
-                                tint = YukiTheme.colors.font
+                                tint = YukiTheme.colors.text
                             )
                         }
 

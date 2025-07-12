@@ -48,7 +48,7 @@ fun SettingsScreen(
             modifier = Modifier.align(Alignment.Center).fillMaxSize()
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Theme", color = Color.White)
+                Text("Theme", color = YukiTheme.colors.text)
                 Themes.list.forEachIndexed { i, theme ->
                     RadioButton(
                         currentThemeName == theme.name,
@@ -97,7 +97,7 @@ expect fun StoreAsTextCheckbox(
 @Composable
 fun SwitchSetting(text: String, switchState: Boolean, onCheckedChange: (Boolean) -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(text, color = Color.White)
+        Text(text, color = YukiTheme.colors.text)
         Switch(switchState, onCheckedChange = onCheckedChange, modifier = Modifier.scale(0.75f))
     }
 }

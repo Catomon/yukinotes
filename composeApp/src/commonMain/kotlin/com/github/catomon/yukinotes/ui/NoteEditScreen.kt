@@ -272,6 +272,7 @@ fun NoteEditPane(yukiViewModel: YukiViewModel, noteId: String? = null) {
                                     yukiViewModel.addNote(
                                         note!!
                                     )
+                                    yukiViewModel.selectNote(note?.id)
 
                                     isChanged = false
                                 } else {

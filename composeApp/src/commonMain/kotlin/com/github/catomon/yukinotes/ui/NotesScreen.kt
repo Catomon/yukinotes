@@ -35,7 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -51,7 +50,7 @@ import kotlin.uuid.Uuid
 
 data class NotesScreenState(
     val notes: List<NoteEntity> = emptyList(),
-    val selectedNoteId: Uuid? = null,
+    val selectedNotes: List<Uuid> = emptyList(),
     var alwaysShowDetails: Boolean = loadSettings().alwaysShowDetails,
     var confirmDelete: Boolean = false
 )
@@ -61,10 +60,6 @@ fun NotesScreen(viewModel: YukiViewModel, navController: NavHostController, modi
     val state by viewModel.notesScreenState.collectAsState()
 
     var showConfirmDeleteNote by remember { mutableStateOf(false) }
-
-    LaunchedEffect(state.selectedNoteId) {
-        showConfirmDeleteNote = false
-    }
 
     Box(
         modifier.background(color = YukiTheme.bars).fillMaxSize().clickable(
@@ -76,7 +71,12 @@ fun NotesScreen(viewModel: YukiViewModel, navController: NavHostController, modi
             NotesStaggeredGrid(
                 state,
                 onNoteSelected = { noteId ->
-                    viewModel.selectNote(if (state.selectedNoteId != noteId) noteId else null)
+                    if (showConfirmDeleteNote)
+                        viewModel.selectNote(noteId)
+                    else {
+                        viewModel.selectNote(null)
+                        viewModel.selectNote(noteId)
+                    }
                 },
                 modifier = Modifier.align(Alignment.TopStart)
                     .padding(horizontal = sizes.notesListPadding)
@@ -85,7 +85,12 @@ fun NotesScreen(viewModel: YukiViewModel, navController: NavHostController, modi
             NotesList(
                 state,
                 onNoteSelected = { noteId ->
-                    viewModel.selectNote(if (state.selectedNoteId != noteId) noteId else null)
+                    if (showConfirmDeleteNote)
+                        viewModel.selectNote(noteId)
+                    else {
+                        viewModel.selectNote(null)
+                        viewModel.selectNote(noteId)
+                    }
                 },
                 modifier = Modifier.align(Alignment.TopStart)
                     .padding(horizontal = sizes.notesListPadding)
@@ -93,14 +98,14 @@ fun NotesScreen(viewModel: YukiViewModel, navController: NavHostController, modi
         }
 
         BottomBar(
-            noteSelected = state.selectedNoteId != null,
+            noteSelected = state.selectedNotes.isNotEmpty(),
             isShowConfirmDelete = showConfirmDeleteNote,
             showRemoveConfirm = {
                 showConfirmDeleteNote = true
             },
             removeNote = {
-                state.selectedNoteId?.let { selectedNoteId ->
-                    viewModel.removeNote(selectedNoteId)
+                state.selectedNotes.forEach {
+                    viewModel.removeNote(it)
                 }
 
                 viewModel.selectNote(null)
@@ -116,9 +121,9 @@ fun NotesScreen(viewModel: YukiViewModel, navController: NavHostController, modi
                 viewModel.selectNote(null)
             },
             editNote = {
-                state.selectedNoteId?.let { selectedNoteId ->
+                state.selectedNotes.firstOrNull()?.let {
                     navController.navigate(
-                        Routes.createRoute(Routes.EDIT_NOTE, selectedNoteId.toString())
+                        Routes.createRoute(Routes.EDIT_NOTE, it.toString())
                     )
                 }
             },
@@ -134,8 +139,9 @@ fun NotesList(viewModel: YukiViewModel, navController: NavHostController, modifi
 
     var showConfirmDeleteNote by remember { mutableStateOf(false) }
 
-    LaunchedEffect(state.selectedNoteId) {
-        showConfirmDeleteNote = false
+    LaunchedEffect(state.selectedNotes) {
+        if (state.selectedNotes.isEmpty())
+            showConfirmDeleteNote = false
     }
 
     Column(
@@ -144,30 +150,37 @@ fun NotesList(viewModel: YukiViewModel, navController: NavHostController, modifi
         ) {
             viewModel.selectNote(null)
         }) {
-            NoteTitlesStaggeredGrid(
-                state,
-                onNoteSelected = { noteId ->
-                    viewModel.selectNote(if (state.selectedNoteId != noteId) noteId else null)
-                },
-                modifier = Modifier.fillMaxWidth().weight(1f)
-                    .padding(horizontal = sizes.notesListPadding)
-            )
+        NoteTitlesStaggeredGrid(
+            state,
+            onNoteSelected = { noteId ->
+                if (showConfirmDeleteNote)
+                    viewModel.selectNote(noteId)
+                else {
+                    viewModel.selectNote(null)
+                    viewModel.selectNote(noteId)
+                }
+            },
+            modifier = Modifier.fillMaxWidth().weight(1f)
+                .padding(horizontal = sizes.notesListPadding)
+        )
 
         BottomBar2(
-            noteSelected = state.selectedNoteId != null,
+            noteSelected = state.selectedNotes.isNotEmpty(),
             isShowConfirmDelete = showConfirmDeleteNote,
             showRemoveConfirm = {
                 showConfirmDeleteNote = true
             },
             removeNote = {
-                state.selectedNoteId?.let { selectedNoteId ->
-                    viewModel.removeNote(selectedNoteId)
+                state.selectedNotes.forEach {
+                    viewModel.removeNote(it)
                 }
 
                 viewModel.selectNote(null)
             },
             cancelRemove = {
                 showConfirmDeleteNote = false
+                if (viewModel.notesScreenState.value.selectedNotes.size > 1)
+                    viewModel.selectNote(null)
             },
             createNote = {
                 viewModel.selectNote(null)
@@ -183,7 +196,7 @@ fun NoteTitlesStaggeredGrid(
     state: NotesScreenState, onNoteSelected: (Uuid) -> Unit, modifier: Modifier = Modifier
 ) {
     val notes = state.notes
-    val selectedNoteId = state.selectedNoteId
+    val selectedNoteId = if (state.selectedNotes.size == 1) state.selectedNotes.first() else null
     val gridState = rememberLazyStaggeredGridState()
     val coroutineScope = rememberCoroutineScope()
 
@@ -202,6 +215,7 @@ fun NoteTitlesStaggeredGrid(
     ) {
         items(notes.size) { index ->
             val note = notes[index]
+            val isSelected = remember(state) { state.selectedNotes.contains(note.id) }
 
             TitleNoteItem(
                 { uuid ->
@@ -209,7 +223,7 @@ fun NoteTitlesStaggeredGrid(
                         gridState.animateScrollToItem(index)
                     }
                     onNoteSelected(uuid)
-                }, note, selectedNoteId
+                }, note, isSelected
             )
         }
     }
@@ -220,7 +234,7 @@ fun NotesStaggeredGrid(
     state: NotesScreenState, onNoteSelected: (Uuid) -> Unit, modifier: Modifier = Modifier
 ) {
     val notes = state.notes
-    val selectedNoteId = state.selectedNoteId
+    val selectedNoteId = if (state.selectedNotes.size == 1) state.selectedNotes.first() else null
     val gridState = rememberLazyStaggeredGridState()
     val coroutineScope = rememberCoroutineScope()
 
@@ -257,7 +271,7 @@ fun NotesList(
     state: NotesScreenState, onNoteSelected: (Uuid) -> Unit, modifier: Modifier = Modifier
 ) {
     val notes = state.notes
-    val selectedNoteId = state.selectedNoteId
+    val selectedNoteId = if (state.selectedNotes.size == 1) state.selectedNotes.first() else null
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
@@ -287,10 +301,8 @@ fun NotesList(
 
 @Composable
 fun TitleNoteItem(
-    onNoteSelected: (Uuid) -> Unit, note: NoteEntity, selectedNoteId: Uuid?, modifier: Modifier = Modifier
+    onNoteSelected: (Uuid) -> Unit, note: NoteEntity, isSelected: Boolean, modifier: Modifier = Modifier
 ) {
-    val isSelected = selectedNoteId == note.id
-
     Box(contentAlignment = Alignment.Center, modifier = modifier) {
         Column(
             Modifier.fillMaxWidth().clickable(
@@ -302,7 +314,7 @@ fun TitleNoteItem(
                 color = YukiTheme.noteBackground, shape = RoundedCornerShape(4.dp)
             ).let {
                 return@let if (isSelected) {
-                    it.border(2.dp, color = Color.White, shape = RoundedCornerShape(4.dp))
+                    it.border(2.dp, color = YukiTheme.colors.textSecondary, shape = RoundedCornerShape(4.dp))
                 } else it
             }.padding(start = 8.dp)
         ) {
