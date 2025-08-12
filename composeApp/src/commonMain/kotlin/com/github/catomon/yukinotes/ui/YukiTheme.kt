@@ -154,7 +154,7 @@ object YukiTheme {
         noteDetails = colors.textSecondary
         background = colors.background
         bars = colors.bars
-        dividers = colors.surfaceSecondary
+        dividers = colors.background
         textOnBackground = background.copy(1f).darken(0.6f)
     }
 

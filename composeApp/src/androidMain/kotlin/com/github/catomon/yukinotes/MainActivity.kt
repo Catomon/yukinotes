@@ -35,13 +35,13 @@ class MainActivity : ComponentActivity() {
             YukiTheme {
                 Scaffold(
                     modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-                    topBar = {
-                        TopAppBar(
-                            title = { Text("yukinotes") },
-                            scrollBehavior = scrollBehavior,
-                            colors = TopAppBarDefaults.topAppBarColors().copy(containerColor =  YukiTheme.bars, scrolledContainerColor = YukiTheme.bars)
-                        )
-                    },
+//                    topBar = {
+//                        TopAppBar(
+//                            title = { Text("yukinotes") },
+//                            scrollBehavior = scrollBehavior,
+//                            colors = TopAppBarDefaults.topAppBarColors().copy(containerColor =  YukiTheme.bars, scrolledContainerColor = YukiTheme.bars)
+//                        )
+//                    },
                 ) {
                     YukiApp(modifier = Modifier.padding(it))
                 }
