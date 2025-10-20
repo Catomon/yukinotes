@@ -74,7 +74,7 @@ fun SettingsScreen(
                 .clickable(onClick = { exitProcess(0) })
                 .align(Alignment.BottomEnd)
         ) {
-            Text("exit app")
+            Text("Exit App")
 
             Image(
                 painterResource(Res.drawable.exit),

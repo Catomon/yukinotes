@@ -33,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
 import com.github.catomon.yukinotes.data.mappers.toNote
 import com.github.catomon.yukinotes.domain.Note
@@ -217,18 +218,7 @@ fun NoteEditPane(yukiViewModel: YukiViewModel, noteId: String? = null) {
                         )
                     }
                 }.padding(vertical = 4.dp),
-//                colors = TextFieldDefaults.colors(
-//                    unfocusedTextColor = Color.White,
-//                    focusedTextColor = Color.White,
-//                    cursorColor = Color.White,
-//                    unfocusedContainerColor = Color.Transparent,
-//                    focusedContainerColor = Color.Transparent,
-//                    errorContainerColor = Color.Transparent,
-//                    unfocusedLabelColor = YukiTheme.colors.surface,
-//                    focusedLabelColor = YukiTheme.colors.surface,
-//                    unfocusedIndicatorColor = Color.Transparent,
-//                    focusedIndicatorColor = Color.Transparent
-//                )
+                cursorBrush = SolidColor(Color.White)
             )
 
             note?.updatedAt?.let { millis ->

@@ -25,8 +25,8 @@ object Themes {
 
     class Pink : IYukiTheme {
         override val name: String = "yuki"
-        override val background = Color(0xffff98b3)
-        override val surface =  Color(0xcdff98b3) //Color(0xffffc5d6).copy(0.4f)
+        override val background = Color(0xffe9678f)
+        override val surface =  Color(0xffff98b3) //Color(0xffffc5d6).copy(0.4f)
         override val surfaceSecondary = Color(0xffc23a80)
         override val text = Color(0xFFFFFFFF)
         override val textSecondary = Color(0xFFFFE1EA)
@@ -58,9 +58,9 @@ object Themes {
 
     class Violet : IYukiTheme {
         override val name: String = "gami-kasa"
-        override val background = Color(0xff6e4eaa)
-        override val surface = Color(0xffc8abff).copy(0.4f)
-        override val surfaceSecondary = Color(0xffc0a1ff).copy(0.8f)
+        override val background = Color(0xff6232a9)
+        override val surface = Color(0xff6e4eaa).copy(0.4f)
+        override val surfaceSecondary = Color(0xff6e4eaa).copy(0.8f)
         override val text = Color(0xFFFFFFFF)
         override val textSecondary = Color(0xFFDECCFF)
         override val bars = Color(0xff6232a9).copy(0.9f)
@@ -69,9 +69,9 @@ object Themes {
 
     class Blue : IYukiTheme {
         override val name: String = "nata"
-        override val background = Color(0xff3a55af)
-        override val surface = Color(0xff6197de).copy(0.4f)
-        override val surfaceSecondary = Color(0xff3671c1).copy(0.8f)
+        override val background = Color(0xff0f2e93)
+        override val surface = Color(0xff3a55af).copy(0.4f)
+        override val surfaceSecondary = Color(0xff3a55af).copy(0.8f)
         override val text = Color(0xFFFFFFFF)
         override val textSecondary = Color(0xffd2e6ff)
         override val bars = Color(0xff0f2e93).copy(0.9f)

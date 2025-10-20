@@ -64,7 +64,7 @@ fun YukiApp(modifier: Modifier = Modifier) {
                     ?: throw IllegalStateException("${RouteArgs.NOTE_ID} argument is missing")
 
                 val customSelectionColors = TextSelectionColors(
-                    handleColor = Color.Gray,
+                    handleColor = Color.White,
                     backgroundColor = Color.Black
                 )
 

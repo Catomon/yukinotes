@@ -106,7 +106,7 @@ fun YukiAppDesktopScreen(modifier: Modifier = Modifier.Companion) {
                         val noteId by remember(notesScreenState) { mutableStateOf(if (notesScreenState.selectedNotes.size == 1) notesScreenState.selectedNotes.firstOrNull()?.toString() else null) }
 
                         val customSelectionColors = TextSelectionColors(
-                            handleColor = Color.Companion.Gray,
+                            handleColor = Color.Companion.White,
                             backgroundColor = Color.Companion.Black
                         )
 
@@ -145,7 +145,7 @@ fun YukiAppDesktopScreen(modifier: Modifier = Modifier.Companion) {
                                     tint = YukiTheme.colors.text
                                 )
 
-                                Text("back")
+                                Text("Back")
                             }
 
                             Spacer(Modifier.weight(2f))
