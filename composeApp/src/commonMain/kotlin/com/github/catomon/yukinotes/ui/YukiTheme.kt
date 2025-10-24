@@ -25,7 +25,7 @@ object Themes {
 
     class Pink : IYukiTheme {
         override val name: String = "yuki"
-        override val background = Color(0xffe9678f)
+        override val background = Color(0xcbe9678f)
         override val surface =  Color(0xffff98b3) //Color(0xffffc5d6).copy(0.4f)
         override val surfaceSecondary = Color(0xffc23a80)
         override val text = Color(0xFFFFFFFF)
@@ -36,7 +36,7 @@ object Themes {
 
     class YukiLight : IYukiTheme {
         override val name: String = "yuki_light"
-        override val background = Color(0xfff1f1f1)
+        override val background = Color(0xccf1f1f1)
         override val surface =  Color(0xcdc2c2c2)
         override val surfaceSecondary = Color(0xffc23a80)
         override val text = Color(0xff000000)
@@ -47,18 +47,19 @@ object Themes {
 
     class LuckyDark : IYukiTheme {
         override val name: String = "lucky_dark"
-        override val background = Color(0xff000000)
+        override val background = Color(0xcc000000)
         override val surface = Color(0xffc33c83)  //Color(0xffffc5d6).copy(0.4f)
         override val surfaceSecondary = Color(0xffc23a80)
         override val text = Color(0xFFFFFFFF)
         override val textSecondary = Color(0xFFFFE1EA)
         override val bars = Color(0xff000000)
         override val barsShadow = Color(0xff000000)
+        override val bgStars: Color = surface.darken(0.25f)
     }
 
     class Violet : IYukiTheme {
         override val name: String = "gami-kasa"
-        override val background = Color(0xff6232a9)
+        override val background = Color(0xcc6232a9)
         override val surface = Color(0xff6e4eaa).copy(0.4f)
         override val surfaceSecondary = Color(0xff6e4eaa).copy(0.8f)
         override val text = Color(0xFFFFFFFF)
@@ -69,7 +70,7 @@ object Themes {
 
     class Blue : IYukiTheme {
         override val name: String = "nata"
-        override val background = Color(0xff0f2e93)
+        override val background = Color(0xcc0f2e93)
         override val surface = Color(0xff3a55af).copy(0.4f)
         override val surfaceSecondary = Color(0xff3a55af).copy(0.8f)
         override val text = Color(0xFFFFFFFF)
@@ -87,6 +88,8 @@ object Themes {
         val textSecondary: Color
         val bars: Color
         val barsShadow: Color
+        val bgStars: Color
+            get() = background.darken(0.75f)
     }
 }
 

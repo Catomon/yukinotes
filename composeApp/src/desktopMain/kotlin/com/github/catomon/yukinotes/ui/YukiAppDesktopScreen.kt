@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -41,6 +42,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.github.catomon.yukinotes.LocalWindow
+import com.github.catomon.yukinotes.ui.util.darken
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.java.KoinJavaComponent
@@ -65,8 +67,9 @@ fun YukiAppDesktopScreen(modifier: Modifier = Modifier.Companion) {
         Image(
             painterResource(Res.drawable.background),
             null,
-            Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp)),
-            contentScale = ContentScale.Crop
+            Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp)).background(backgroundColor.copy(alpha = 1f)),
+            contentScale = ContentScale.Crop,
+            colorFilter = ColorFilter.tint(YukiTheme.colors.bgStars)
         )
 
         Column(Modifier.fillMaxSize()) {
